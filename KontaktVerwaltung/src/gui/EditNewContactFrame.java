@@ -33,7 +33,6 @@ import add.Methods;
 import add.MyIcon;
 import classes.Contact;
 import classes.nObj;
-import main.MainMethod;
 
 public class EditNewContactFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -115,14 +114,14 @@ public class EditNewContactFrame extends JFrame {
 								JOptionPane.WARNING_MESSAGE);
 					else {
 						System.out.println("Gespeichert:" + street);
-						File f = new File(MainMethod.userHomeDir + MainMethod.DIR + MainMethod.FILE);
+						File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
 						Methods.editItem(f.getAbsolutePath(), new Contact(firstName, lastName,
 								street + ";" + ort + ";" + country, phone, mail, contact.getId()));
 						frame.setEnabled(true);
 
 						DefaultListModel filteredItems = new DefaultListModel<>();
 						EditNewContactFrame.this.alContacts = Methods
-								.readAllContacts(new File(MainMethod.userHomeDir + MainMethod.DIR + MainMethod.FILE));
+								.readAllContacts(new File(Methods.userHomeDir + Methods.DIR + Methods.FILE));
 
 						for (int i = 0; i < alContacts.size(); i++) {
 							Contact contact = alContacts.get(i);

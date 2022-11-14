@@ -29,9 +29,9 @@ import main.MainMethod;
 import res.Consts;
 
 public class Methods {
-	private static String userHomeDir = "";
-	private static final String DIR = "\\Kontaktverwaltung\\Kontakte";
-	private static final String FILE = "\\Kontaktdaten.txt";
+	public static String userHomeDir = "";
+	public static final String DIR = "\\Kontaktverwaltung\\Kontakte";
+	public static final String FILE = "\\Kontaktdaten.txt";
 
 	public static void setUpMain() {
 		userHomeDir = System.getenv("USERPROFILE");

@@ -100,7 +100,7 @@ public class JPanelContactDetails extends JPanel{
 
 				li.add((nObj) list.getSelectedValue());
 
-				Methods.deleteItemFile(MainMethod.userHomeDir + MainMethod.DIR + MainMethod.FILE, li);
+				Methods.deleteItemFile(Methods.userHomeDir + Methods.DIR + Methods.FILE, li);
 				DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
 
 				model.removeElementAt(list.getSelectedIndex());
