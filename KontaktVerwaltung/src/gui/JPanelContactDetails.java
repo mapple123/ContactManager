@@ -10,6 +10,7 @@ import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -41,6 +42,7 @@ public class JPanelContactDetails extends JPanel{
 	private JScrollPane scrollPaneDetails;
 	private JList list;
 	private Contact contact;
+	private ResourceBundle bundle;
 
 	public Contact getContact() {
 		return contact;
@@ -51,10 +53,10 @@ public class JPanelContactDetails extends JPanel{
 	}
 
 	public JPanelContactDetails(JList list, MainFrame frame, ArrayList<Contact> alContacts, boolean search,
-			DefaultListModel model) {
+			DefaultListModel model, ResourceBundle bundle) {
 
 		this.list = list;
-
+		this.bundle = bundle;
 		BorderLayout layout = new BorderLayout();
 		setLayout(layout);
 
@@ -118,7 +120,7 @@ public class JPanelContactDetails extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				frame.setEnabled(false);
 
-				EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, alContacts, search, contact, model);
+				EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, alContacts, search, contact, model, bundle);
 
 				eFrame.setContact(contact);
 				eFrame.setSplitPane(splitPane);

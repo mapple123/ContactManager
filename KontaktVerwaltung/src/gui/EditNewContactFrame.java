@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -64,7 +65,7 @@ public class EditNewContactFrame extends JFrame {
 	}
 
 	public EditNewContactFrame(MainFrame frame, JList list, final ArrayList<Contact> allContacts, boolean search,
-			Contact contact, final DefaultListModel model) {
+			Contact contact, final DefaultListModel model, ResourceBundle bundle) {
 		super();
 		this.search = search;
 		this.list = list;

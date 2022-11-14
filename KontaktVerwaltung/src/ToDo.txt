@@ -1,0 +1,3 @@
+ToDo:	
+	Alle Strings in der GUI flexible aus dem Textbundle 
+	übernehmen.

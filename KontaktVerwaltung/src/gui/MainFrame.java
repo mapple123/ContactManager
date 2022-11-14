@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
@@ -32,6 +33,7 @@ import add.Methods;
 import add.MyIcon;
 import classes.Contact;
 import classes.nObj;
+import res.Consts;
 
 public class MainFrame extends JFrame {
 
@@ -54,12 +56,12 @@ public class MainFrame extends JFrame {
 	private DefaultListModel model;
 
 	private JSplitPane splitpane;
-
-	public MainFrame(File file) {
-		super("Kontaktverwaltung | Kontakte");
+	private ResourceBundle bundle;
+	public MainFrame(File file, ResourceBundle bundle) {
+		super(bundle.getString(Consts.TITEL));
 		setExtendedState(MAXIMIZED_BOTH);
 		this.file = file;
-
+		this.bundle = bundle;
 		initComponents();
 		setComponents();
 
@@ -85,7 +87,7 @@ public class MainFrame extends JFrame {
 		width = (int) screenSize.getWidth() / 2;
 		height = (int) screenSize.getHeight() / 2;
 
-		jPanelContactDetails = new JPanelContactDetails(listFiles, this, allContacts, false, model);
+		jPanelContactDetails = new JPanelContactDetails(listFiles, this, allContacts, false, model, bundle);
 
 		mainpane = getContentPane();
 
@@ -153,7 +155,7 @@ public class MainFrame extends JFrame {
 		splitpane.setResizeWeight(0.5);
 
 		menuBar = new CustomMenu(this, listFiles, allContacts, file.getAbsolutePath(), jPanelContactDetails, splitpane,
-				scrollPaneDetails);
+				scrollPaneDetails, bundle);
 		JTextField jtfSearch = new JTextField();
 		jtfSearch.setPreferredSize(new Dimension(300, 35));
 		jtfSearch.getDocument().addDocumentListener(new DocumentListener() {

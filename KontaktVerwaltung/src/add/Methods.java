@@ -2,24 +2,61 @@ package add;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
 import classes.Contact;
 import classes.nObj;
+import gui.MainFrame;
 import main.MainMethod;
+import res.Consts;
 
 public class Methods {
+	private static String userHomeDir = "";
+	private static final String DIR = "\\Kontaktverwaltung\\Kontakte";
+	private static final String FILE = "\\Kontaktdaten.txt";
 
+	public static void setUpMain() {
+		userHomeDir = System.getenv("USERPROFILE");
+		Locale currentLocale = Locale.getDefault();
+		System.out.println(currentLocale);
+		ResourceBundle bundle = ResourceBundle.getBundle(Consts.FILENAME, currentLocale);
+		File contactDataFile = new File(userHomeDir + DIR + FILE);
+		if (!contactDataFile.exists()) {
+			File dirFile = new File(userHomeDir + DIR);
+			dirFile.mkdirs();
+			try {
+				contactDataFile.createNewFile();
+				System.out.println("erstellt");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		new MainFrame(contactDataFile, bundle);
+
+	}
 	public static Contact saveContact(Contact contact) {
-		File file = new File(MainMethod.userHomeDir + MainMethod.DIR + MainMethod.FILE);
+		File file = new File(userHomeDir + DIR + FILE);
 		FileWriter fw = null;
 		String firstName = contact.getFirstName();
 		String lastName = contact.getLastName();
@@ -212,6 +249,41 @@ public class Methods {
 		}
 
 		return sb.toString();
+	}
+	
+	
+	public static void writeConfig(List<Contact> contacts, String mP) throws Exception
+	{
+		FileOutputStream file = new FileOutputStream("bgSave.enc");
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream objectStream = new ObjectOutputStream(bos);
+		for(Contact contact : contacts) {
+			objectStream.writeObject(contact);
+		}
+		
+		ReadWriteAES.encode(bos.toByteArray(), file, mP);
+		
+		objectStream.close();
+	}
+	
+	public static ArrayList<Contact> readConfig(String mP) throws Exception
+	{
+		Contact config = null;
+		
+		FileInputStream file = new FileInputStream("bgSave.enc");
+		byte[] fileContent = ReadWriteAES.decode(file, mP);
+		ByteArrayInputStream bis = new ByteArrayInputStream(fileContent);
+		ObjectInputStream objectStream = new ObjectInputStream(bis);
+		ArrayList<Contact> users = new ArrayList<Contact>();
+		//Set<User> users = new HashSet<>();
+		try { 
+		  for (;;) { 
+			config = (Contact) objectStream.readObject();
+			users.add(config);
+		  }
+		} catch (EOFException e) {
+		} 
+		return users;
 	}
 
 }

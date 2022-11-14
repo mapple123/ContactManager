@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -37,11 +38,12 @@ public class CustomMenu extends JMenuBar implements ActionListener {
 	private JPanelContactDetails panelDetails;
 	private JSplitPane splitPane;
 	private JScrollPane scrollPaneDetails;
+	private ResourceBundle bundle;
 
 	private boolean search;
 
 	public CustomMenu(MainFrame frame, JList<?> list, ArrayList<Contact> allContacts, String path,
-			JPanelContactDetails panelDetails, JSplitPane splitPane, JScrollPane scrollPaneDetails) {
+			JPanelContactDetails panelDetails, JSplitPane splitPane, JScrollPane scrollPaneDetails, ResourceBundle bundle) {
 		this.path = path;
 		this.frame = frame;
 		this.list = list;
@@ -49,7 +51,7 @@ public class CustomMenu extends JMenuBar implements ActionListener {
 		this.panelDetails = panelDetails;
 		this.splitPane = splitPane;
 		this.scrollPaneDetails = scrollPaneDetails;
-
+		this.bundle = bundle;
 		menuBar = new JMenuBar();
 
 		menu = new JMenu("Neu");
@@ -92,7 +94,7 @@ public class CustomMenu extends JMenuBar implements ActionListener {
 
 		if (e.getSource() == menuItem2) {
 			frame.setEnabled(false);
-			EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, allContacts, search, null, null);
+			EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, allContacts, search, null, null, bundle);
 			eFrame.setContact(null);
 		} else if (e.getSource() == menuItem) {
 			if (list.getSelectedIndices().length > 0) {
