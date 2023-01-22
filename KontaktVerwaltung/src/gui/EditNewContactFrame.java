@@ -33,6 +33,7 @@ import add.Methods;
 import add.MyIcon;
 import classes.Contact;
 import classes.nObj;
+import res.Consts;
 
 public class EditNewContactFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -41,8 +42,8 @@ public class EditNewContactFrame extends JFrame {
 	private JList list;
 	private ArrayList<Contact> alContacts;
 	private boolean search;
-	private final String[] LABELS = { "Vorname*:", "Nachname*:", "Straße/Nr.:", "PLZ/Ort:", "Land:", "Telefon/Handy:",
-			"E-Mail:" };
+	private ResourceBundle bundle;
+	private final String[] LABELS;
 	private JLabel[] labels = new JLabel[7];
 	private JTextField[] fields = new JTextField[7];
 	private JPanel[] wrapperPanels = new JPanel[7];
@@ -71,10 +72,20 @@ public class EditNewContactFrame extends JFrame {
 		this.frame = frame;
 		this.alContacts = allContacts;
 		this.model = model;
-
+		this.bundle = bundle;
+		
+		LABELS = new String[]{
+				bundle.getString(Consts.VORNAME),  
+				bundle.getString(Consts.NACHNAME),  
+				bundle.getString(Consts.STRASSENR),  
+				bundle.getString(Consts.PLZORT),  
+				bundle.getString(Consts.LAND), 
+				bundle.getString(Consts.TELEFON),
+				bundle.getString(Consts.MAIL) 
+				};
 		buildPanel(contact);
 
-		JButton btnOk = new JButton("OK");
+		JButton btnOk = new JButton(bundle.getString(Consts.OK));
 		btnOk.addActionListener(new ActionListener() {
 
 			@Override
@@ -89,6 +100,7 @@ public class EditNewContactFrame extends JFrame {
 
 				if (contact == null) {
 					if ((firstName.length() == 0 && lastName.length() == 0))
+						//TODO: Strings erstellen
 						JOptionPane.showMessageDialog(EditNewContactFrame.this,
 								"Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
 								JOptionPane.WARNING_MESSAGE);
@@ -109,6 +121,7 @@ public class EditNewContactFrame extends JFrame {
 
 				} else if (contact != null) {
 					if ((firstName.length() == 0 && lastName.length() == 0))
+						//TODO: Strings erstellen
 						JOptionPane.showMessageDialog(EditNewContactFrame.this,
 								"Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
 								JOptionPane.WARNING_MESSAGE);
@@ -150,7 +163,7 @@ public class EditNewContactFrame extends JFrame {
 			}
 		});
 
-		JButton btnCancel = new JButton("Abbrechen");
+		JButton btnCancel = new JButton(bundle.getString(Consts.ABBRECHEN));
 		btnCancel.addActionListener(new ActionListener() {
 
 			@Override
@@ -194,10 +207,10 @@ public class EditNewContactFrame extends JFrame {
 	private void buildPanel(Contact contact) {
 		setComp();
 		if (contact == null) {
-			setTitle("Neuer Benutzer");
+			setTitle(bundle.getString(Consts.NEUTITEL));
 
 		} else {
-			setTitle("Benutzer bearbeiten");
+			setTitle( bundle.getString(Consts.BEARBEITENTITEL));
 			setAllData(contact);
 		}
 	}
@@ -210,7 +223,7 @@ public class EditNewContactFrame extends JFrame {
 			fields[i] = new JTextField();
 
 			fields[i].setDocument(new JTextFieldLimit(100));
-			fields[i].setToolTipText("Max. 100 Zeichen");
+			fields[i].setToolTipText(bundle.getString(Consts.LIMITTEXT));
 
 			labels[i].setPreferredSize(new Dimension(100, 35));
 			fields[i].setPreferredSize(new Dimension(300, 35));

@@ -35,7 +35,8 @@ public class Methods {
 
 	public static void setUpMain() {
 		userHomeDir = System.getenv("USERPROFILE");
-		Locale currentLocale = Locale.getDefault();
+		//Locale currentLocale = Locale.getDefault();
+		Locale currentLocale = Locale.GERMAN;
 		System.out.println(currentLocale);
 		ResourceBundle bundle = ResourceBundle.getBundle(Consts.FILENAME, currentLocale);
 		File contactDataFile = new File(userHomeDir + DIR + FILE);

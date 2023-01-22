@@ -202,7 +202,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		JButton btnSearch = new JButton("Suchen");
+		JButton btnSearch = new JButton(bundle.getString(Consts.SUCHEN));
 		btnSearch.addActionListener(new ActionListener() {
 
 			@Override

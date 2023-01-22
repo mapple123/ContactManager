@@ -21,6 +21,7 @@ import javax.swing.KeyStroke;
 import add.Methods;
 import classes.Contact;
 import classes.nObj;
+import res.Consts;
 
 public class CustomMenu extends JMenuBar implements ActionListener {
 
@@ -54,31 +55,31 @@ public class CustomMenu extends JMenuBar implements ActionListener {
 		this.bundle = bundle;
 		menuBar = new JMenuBar();
 
-		menu = new JMenu("Neu");
+		menu = new JMenu(bundle.getString(Consts.NEU));
 		menu.setFont(new Font("Arial", Font.PLAIN, 30));
 		menu.setMnemonic(KeyEvent.VK_N);
 
 		menuBar.add(menu);
 
-		menu3 = new JMenu("Löschen");
+		menu3 = new JMenu(bundle.getString(Consts.LOESCHEN));
 		menu3.setFont(new Font("Arial", Font.PLAIN, 30));
 		menu3.setMnemonic(KeyEvent.VK_L);
 
 		menuBar.add(menu3);
 
-		menuItem = new JMenuItem("Wirklich Löschen?", KeyEvent.VK_J);
+		menuItem = new JMenuItem(bundle.getString(Consts.SUBLOESCHEN), KeyEvent.VK_J);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.ALT_MASK));
 
 		menuItem.addActionListener(this);
 		menu3.add(menuItem);
 
-		menuItem2 = new JMenuItem("Neuer Kontakt", KeyEvent.VK_P);
+		menuItem2 = new JMenuItem(bundle.getString(Consts.NEUTITEL), KeyEvent.VK_P);
 		menuItem2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
 
 		menuItem2.addActionListener(this);
 		menu.add(menuItem2);
 
-		menu2 = new JMenu("Filter/Sortieren");
+		menu2 = new JMenu(bundle.getString(Consts.FILERSORTIEREN));
 		menu2.setFont(new Font("Arial", Font.PLAIN, 30));
 		menu2.setMnemonic(KeyEvent.VK_R);
 		menu2.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
@@ -120,6 +121,7 @@ public class CustomMenu extends JMenuBar implements ActionListener {
 				}
 
 			} else {
+				//TODO: Strings erstellen in Consts und in Textbundle
 				JOptionPane.showMessageDialog(frame, "Achtung", "Kein Eintrag egal", JOptionPane.WARNING_MESSAGE);
 			}
 		}

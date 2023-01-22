@@ -30,11 +30,11 @@ import add.Methods;
 import classes.Contact;
 import classes.nObj;
 import main.MainMethod;
+import res.Consts;
 
 public class JPanelContactDetails extends JPanel{
 
-	private final String[] LABELS = { "Vorname:", "Nachname:", "Straße/Nr.:", "PLZ/Ort:", "Land:", "Telefon/Handy:",
-			"E-Mail:" };
+	
 	private JLabel[] labels = new JLabel[7];
 	private JLabel[] fields = new JLabel[7];
 	private JPanel[] wrapperPanels = new JPanel[7], holderPanel;
@@ -43,6 +43,8 @@ public class JPanelContactDetails extends JPanel{
 	private JList list;
 	private Contact contact;
 	private ResourceBundle bundle;
+	
+	private final String[] LABELS; 
 
 	public Contact getContact() {
 		return contact;
@@ -57,6 +59,16 @@ public class JPanelContactDetails extends JPanel{
 
 		this.list = list;
 		this.bundle = bundle;
+		
+		LABELS = new String[]{
+				bundle.getString(Consts.VORNAME),  
+				bundle.getString(Consts.NACHNAME),  
+				bundle.getString(Consts.STRASSENR),  
+				bundle.getString(Consts.PLZORT),  
+				bundle.getString(Consts.LAND), 
+				bundle.getString(Consts.TELEFON),
+				bundle.getString(Consts.MAIL) 
+				};
 		BorderLayout layout = new BorderLayout();
 		setLayout(layout);
 
@@ -89,7 +101,7 @@ public class JPanelContactDetails extends JPanel{
 		BoxLayout layout2 = new BoxLayout(container, BoxLayout.PAGE_AXIS);
 		container.setLayout(layout2);
 
-		JButton btnLoeschen = new JButton("Löschen");
+		JButton btnLoeschen = new JButton(bundle.getString(Consts.LOESCHEN));
 		btnLoeschen.addActionListener(new ActionListener() {
 
 			@Override
@@ -113,7 +125,7 @@ public class JPanelContactDetails extends JPanel{
 			}
 		});
 
-		JButton btnBearbeiten = new JButton("Bearbeiten");
+		JButton btnBearbeiten = new JButton(bundle.getString(Consts.BEARBEITEN));
 		btnBearbeiten.addActionListener(new ActionListener() {
 
 			@Override
@@ -129,7 +141,7 @@ public class JPanelContactDetails extends JPanel{
 
 			}
 		});
-		JButton btnClose = new JButton("Schließen");
+		JButton btnClose = new JButton(bundle.getString(Consts.SCHLIESSEN));
 		btnClose.addActionListener(new ActionListener() {
 			
 			@Override
