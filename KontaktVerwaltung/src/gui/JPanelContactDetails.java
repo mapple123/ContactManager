@@ -1,256 +1,327 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Label;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import add.ESortOrder;
 import add.Methods;
 import classes.Contact;
 import classes.nObj;
-import main.MainMethod;
 import res.Consts;
 
-public class JPanelContactDetails extends JPanel{
+import static add.ESortOrder.ASC;
+import static add.ESortOrder.DESC;
 
-	
-	private JLabel[] labels = new JLabel[7];
-	private JLabel[] fields = new JLabel[7];
-	private JPanel[] wrapperPanels = new JPanel[7], holderPanel;
-	private JSplitPane splitPane;
-	private JScrollPane scrollPaneDetails;
-	private JList list;
-	private Contact contact;
-	private ResourceBundle bundle;
-	
-	private final String[] LABELS; 
+public class JPanelContactDetails extends JPanel {
 
-	public Contact getContact() {
-		return contact;
-	}
 
-	public void setContact(Contact contact) {
-		this.contact = contact;
-	}
+    private JLabel[] labels = new JLabel[7];
+    private JLabel[] fields = new JLabel[7];
+    private JPanel[] wrapperPanels = new JPanel[7], holderPanel;
+    private JSplitPane splitPane;
+    private JScrollPane scrollPaneDetails;
+    private JList list;
+    private Contact contact;
+    private ResourceBundle bundle;
 
-	public JPanelContactDetails(JList list, MainFrame frame, ArrayList<Contact> alContacts, boolean search,
-			DefaultListModel model, ResourceBundle bundle) {
+    private final String[] LABELS;
 
-		this.list = list;
-		this.bundle = bundle;
-		
-		LABELS = new String[]{
-				bundle.getString(Consts.VORNAME),  
-				bundle.getString(Consts.NACHNAME),  
-				bundle.getString(Consts.STRASSENR),  
-				bundle.getString(Consts.PLZORT),  
-				bundle.getString(Consts.LAND), 
-				bundle.getString(Consts.TELEFON),
-				bundle.getString(Consts.MAIL) 
-				};
-		BorderLayout layout = new BorderLayout();
-		setLayout(layout);
+    public Contact getContact() {
+        return contact;
+    }
 
-		JPanel container = new JPanel();
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
 
-		for (int i = 0; i < labels.length; i++) {
-			labels[i] = new JLabel(LABELS[i]);
-			fields[i] = new JLabel();
-			fields[i].setBackground(Color.WHITE);
-			fields[i].setOpaque(true);
-			labels[i].setPreferredSize(new Dimension(100, 35));
-			fields[i].setPreferredSize(new Dimension(300, 35));
+    public JPanelContactDetails(JList list, MainFrame frame, ArrayList<Contact> alContacts, boolean search,
+                                DefaultListModel model, ResourceBundle bundle) {
 
-			wrapperPanels[i] = new JPanel();
-			wrapperPanels[i].setBorder(
-					BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new LineBorder(Color.BLACK)));
-			wrapperPanels[i].setBackground(Color.LIGHT_GRAY);
+        this.list = list;
+        this.bundle = bundle;
 
-			Border border = fields[i].getBorder();
-			Border margin = new EmptyBorder(10, 10, 10, 10);
-			fields[i].setBorder(new CompoundBorder(border, margin));
+        LABELS = new String[]{
+                bundle.getString(Consts.VORNAME),
+                bundle.getString(Consts.NACHNAME),
+                bundle.getString(Consts.STRASSENR),
+                bundle.getString(Consts.PLZORT),
+                bundle.getString(Consts.LAND),
+                bundle.getString(Consts.TELEFON),
+                bundle.getString(Consts.MAIL)
+        };
+        BorderLayout layout = new BorderLayout();
+        setLayout(layout);
 
-			wrapperPanels[i].add(labels[i]);
-			wrapperPanels[i].add(fields[i]);
-			container.add(wrapperPanels[i]);
-		}
+        JPanel container = new JPanel();
 
-		container.setAlignmentX(Component.LEFT_ALIGNMENT);
-		container.setAlignmentY(Component.TOP_ALIGNMENT);
-		BoxLayout layout2 = new BoxLayout(container, BoxLayout.PAGE_AXIS);
-		container.setLayout(layout2);
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = new JLabel(LABELS[i]);
+            fields[i] = new JLabel();
+            fields[i].setBackground(Color.WHITE);
+            fields[i].setOpaque(true);
+            labels[i].setPreferredSize(new Dimension(100, 35));
+            fields[i].setPreferredSize(new Dimension(300, 35));
 
-		JButton btnLoeschen = new JButton(bundle.getString(Consts.LOESCHEN));
-		btnLoeschen.addActionListener(new ActionListener() {
+            wrapperPanels[i] = new JPanel();
+            wrapperPanels[i].setBorder(
+                    BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new LineBorder(Color.BLACK)));
+            wrapperPanels[i].setBackground(Color.LIGHT_GRAY);
+            //wrapperPanels[i].setPreferredSize(new Dimension(100,65));
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+            Border border = fields[i].getBorder();
+            Border margin = new EmptyBorder(10, 10, 10, 10);
+            fields[i].setBorder(new CompoundBorder(border, margin));
 
-				System.out.println("Löschen");
-				ArrayList<nObj> li = new ArrayList<>();
+            wrapperPanels[i].add(labels[i]);
+            wrapperPanels[i].add(fields[i]);
+            container.add(wrapperPanels[i]);
+            container.add(Box.createVerticalGlue());
+        }
+        container.setLayout(new FlowLayout(FlowLayout.TRAILING));
+        container.setAlignmentX(Component.LEFT_ALIGNMENT);
+        container.setAlignmentY(Component.TOP_ALIGNMENT);
+        BoxLayout layout2 = new BoxLayout(container, BoxLayout.PAGE_AXIS);
 
-				li.add((nObj) list.getSelectedValue());
+        container.setLayout(layout2);
 
-				Methods.deleteItemFile(Methods.userHomeDir + Methods.DIR + Methods.FILE, li);
-				DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
+        //container.setLayout(new GridLayout(fields.length, 1));
 
-				model.removeElementAt(list.getSelectedIndex());
 
-				list.clearSelection();
-				setVisible(false);
-				scrollPaneDetails.setVisible(false);
-				splitPane.setDividerSize(0);
+        JScrollPane scrollPane = new JScrollPane(container);
+        //JScrollPane scrollPane = new JScrollPane(container);
+        fixScrolling(scrollPane);
 
-			}
-		});
+        ScrollPaneLayout layoutP = new ScrollPaneLayout();
+        scrollPane.setLayout(layoutP);
 
-		JButton btnBearbeiten = new JButton(bundle.getString(Consts.BEARBEITEN));
-		btnBearbeiten.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				frame.setEnabled(false);
+        JButton btnLoeschen = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("resources/delete.png"))));
+        editButton(btnLoeschen);
+        btnLoeschen.setToolTipText(bundle.getString(Consts.LOESCHEN));
+        btnLoeschen.addActionListener(new ActionListener() {
 
-				EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, alContacts, search, contact, model, bundle);
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-				eFrame.setContact(contact);
-				eFrame.setSplitPane(splitPane);
-				eFrame.setScrollPane(scrollPaneDetails);
-				eFrame.setContactDetails(JPanelContactDetails.this);
+                System.out.println("Löschen");
+                ArrayList<nObj> li = new ArrayList<>();
+                System.out.println(((nObj) list.getSelectedValue()).getContact().getFirstName());
+                alContacts.remove(((nObj) list.getSelectedValue()).getContact());
+                li.add((nObj) list.getSelectedValue());
 
-			}
-		});
-		JButton btnClose = new JButton(bundle.getString(Consts.SCHLIESSEN));
-		btnClose.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				list.clearSelection();
+                Methods.deleteItemFile(Methods.userHomeDir + Methods.DIR + Methods.FILE, li);
+                DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
 
-				splitPane.setDividerSize(0);
-				scrollPaneDetails.setVisible(false);
-				setVisible(false);
-				
-			}
-		} );
+                model.removeElementAt(list.getSelectedIndex());
 
-		JPanel panelWrapper = new JPanel();
-		panelWrapper.setLayout(new GridLayout());
+                list.clearSelection();
+                setVisible(false);
+                scrollPaneDetails.setVisible(false);
+                //scrollPane.setVisible(false);
+                splitPane.setDividerSize(0);
 
-		JPanel panelHolderEdit = new JPanel();
-		panelHolderEdit.setLayout(new FlowLayout(Label.LEFT));
+            }
+        });
 
-		JPanel panelHolderDelete = new JPanel();
-		panelHolderDelete.setLayout(new FlowLayout(Label.RIGHT));
+        JButton btnBearbeiten = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("resources/edit.png"))));
+        editButton(btnBearbeiten);
+        btnBearbeiten.setToolTipText(bundle.getString(Consts.BEARBEITEN));
+        btnBearbeiten.addActionListener(new ActionListener() {
 
-		JPanel panelHolderClose = new JPanel();
-		panelHolderClose.setLayout(new FlowLayout(Label.RIGHT));
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                frame.setEnabled(false);
+                ESortOrder eSortOrder = null;
 
-		panelHolderEdit.add(btnBearbeiten);
-		panelHolderDelete.add(btnLoeschen);
+                if (frame.getCustomMenu().rbMenuItem.isSelected())
+                    eSortOrder = ASC;
+                else if(frame.getCustomMenu().rbMenuItem2.isSelected())
+                    eSortOrder = DESC;
+                EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, alContacts, search, contact, model, bundle, eSortOrder);
 
-		panelWrapper.add(panelHolderEdit);
-		panelWrapper.add(panelHolderDelete);
+                eFrame.setContact(contact);
+                eFrame.setSplitPane(splitPane);
+                eFrame.setScrollPane(scrollPaneDetails);
+                eFrame.setContactDetails(JPanelContactDetails.this);
 
-		panelHolderClose.add(btnClose);
+            }
+        });
+        JButton btnClose = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("resources/closewindow.png"))));
 
-		add(panelHolderClose, BorderLayout.NORTH);
-		add(panelWrapper, BorderLayout.SOUTH);
-		add(container, BorderLayout.CENTER);
+        editButton(btnClose);
+        btnClose.setToolTipText(bundle.getString(Consts.SCHLIESSEN));
+        btnClose.addActionListener(new ActionListener() {
 
-	
-		setVisible(false);
-		
-	}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.clearSelection();
 
-	public void setSplitPane(JSplitPane splitPane) {
-		this.splitPane = splitPane;
-	}
+                splitPane.setDividerSize(0);
+                scrollPaneDetails.setVisible(false);
+                //scrollPane.setVisible(false);
+                setVisible(false);
 
-	public void setScrollPane(JScrollPane scrollPaneDetails) {
-		this.scrollPaneDetails = scrollPaneDetails;
-	}
+            }
+        });
 
-	public void setAllData(Contact data) {
-		String[] adresse = data.getAddress().split(";");
-		String street;
-		String plzOrt;
-		String country;
-		System.out.println(adresse.length);
-		if (adresse.length <= 0) {
-			street = "";
-			plzOrt = "";
-			country = "";
-		} else {
-			
-			if (adresse.length == 1 && adresse[0] != null && !adresse[0].isEmpty())
-				street = adresse[0];
-			else
-				street = "";
-			
-			
-			if (adresse.length == 2 && adresse[1] != null && !adresse[1].isEmpty()) {
-				if( adresse[0] != null)
-					street = adresse[0];
-				else 
-					street = "";
-				plzOrt = adresse[1];
-			}
-				
-			else {
-				plzOrt = "";
-			}
-				
-			if (adresse.length == 3 && adresse[2] != null && !adresse[2].isEmpty()) {
-				if( adresse[0] != null  && !adresse[0].isEmpty())
-					street = adresse[0];
-				else 
-					street = "";
-				if( adresse[1] != null  && !adresse[1].isEmpty())
-					plzOrt = adresse[1];
-				else 
-					plzOrt = "";
-				
-				country = adresse[2];
-			}else {
-				country = "";
-			}		
+        JButton buttonMenu = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("resources/menu.png"))));
+        editButton(buttonMenu);
+        buttonMenu.setToolTipText(bundle.getString(Consts.MENU));
+        JPanel panelWrapper = new JPanel();
+        panelWrapper.setLayout(new GridLayout());
 
-		}
-		System.out.println("S:" + street);
-		System.out.println("P:" + plzOrt);
-		System.out.println("C:" + country);
-		fields[0].setText(data.getFirstName());
-		fields[1].setText(data.getLastName());
-		fields[2].setText(street);
-		fields[3].setText(plzOrt);
-		fields[4].setText(country);
-		fields[5].setText(data.getPhone());
-		fields[6].setText(data.getMail());
+        JPanel panelHolderEdit = new JPanel();
+        panelHolderEdit.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-	}
+        JPanel panelHolderDelete = new JPanel();
+        panelHolderDelete.setLayout(new FlowLayout(Label.RIGHT));
 
-	
+        JPanel panelHolderMenu = new JPanel();
+        panelHolderMenu.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JPanel panelHolderClose = new JPanel();
+        panelHolderClose.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        panelHolderDelete.setVisible(false);
+        panelHolderEdit.setVisible(false);
+        buttonMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(!panelHolderDelete.isVisible() && !panelHolderEdit.isVisible()){
+                    buttonMenu.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                            .getResource("resources/openmenu.png"))));
+                    panelHolderDelete.setVisible(true);
+                    panelHolderEdit.setVisible(true);
+                }else{
+                    buttonMenu.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                            .getResource("resources/menu.png"))));
+                    panelHolderDelete.setVisible(false);
+                    panelHolderEdit.setVisible(false);
+                }
+            }
+        });
+
+        panelHolderEdit.add(btnBearbeiten);
+        panelHolderDelete.add(btnLoeschen);
+        panelHolderMenu.add(buttonMenu);
+
+        panelWrapper.add(panelHolderClose);
+        panelWrapper.add(panelHolderEdit);
+        panelWrapper.add(panelHolderDelete);
+        panelWrapper.add(panelHolderMenu);
+
+        panelHolderClose.add(btnClose);
+
+        add(panelWrapper, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+
+        setVisible(false);
+    }
+
+    public void setSplitPane(JSplitPane splitPane) {
+        this.splitPane = splitPane;
+    }
+
+    public void setScrollPane(JScrollPane scrollPaneDetails) {
+        this.scrollPaneDetails = scrollPaneDetails;
+    }
+
+    public void setAllData(Contact data) {
+        String[] adresse = data.getAddress().split(";");
+        String street;
+        String plzOrt;
+        String country;
+        System.out.println(adresse.length);
+        if (adresse.length <= 0) {
+            street = "";
+            plzOrt = "";
+            country = "";
+        } else {
+
+            if (adresse.length == 1 && adresse[0] != null && !adresse[0].isEmpty())
+                street = adresse[0];
+            else
+                street = "";
+
+
+            if (adresse.length == 2 && adresse[1] != null && !adresse[1].isEmpty()) {
+                if (adresse[0] != null)
+                    street = adresse[0];
+                else
+                    street = "";
+                plzOrt = adresse[1];
+            } else {
+                plzOrt = "";
+            }
+
+            if (adresse.length == 3 && adresse[2] != null && !adresse[2].isEmpty()) {
+                if (adresse[0] != null && !adresse[0].isEmpty())
+                    street = adresse[0];
+                else
+                    street = "";
+                if (adresse[1] != null && !adresse[1].isEmpty())
+                    plzOrt = adresse[1];
+                else
+                    plzOrt = "";
+
+                country = adresse[2];
+            } else {
+                country = "";
+            }
+
+        }
+        System.out.println("S:" + street);
+        System.out.println("P:" + plzOrt);
+        System.out.println("C:" + country);
+        fields[0].setText(data.getFirstName());
+        fields[1].setText(data.getLastName());
+        fields[2].setText(street);
+        fields[3].setText(plzOrt);
+        fields[4].setText(country);
+        fields[5].setText(data.getPhone());
+        fields[6].setText(data.getMail());
+
+    }
+
+    public static void fixScrolling(JScrollPane scrollpane) {
+        JLabel systemLabel = new JLabel();
+        FontMetrics metrics = systemLabel.getFontMetrics(systemLabel.getFont());
+        int lineHeight = metrics.getHeight();
+        int charWidth = metrics.getMaxAdvance();
+
+        JScrollBar systemVBar = new JScrollBar(JScrollBar.VERTICAL);
+        JScrollBar systemHBar = new JScrollBar(JScrollBar.HORIZONTAL);
+        int verticalIncrement = systemVBar.getUnitIncrement();
+        int horizontalIncrement = systemHBar.getUnitIncrement();
+
+        scrollpane.getVerticalScrollBar().setUnitIncrement(lineHeight * verticalIncrement);
+        scrollpane.getHorizontalScrollBar().setUnitIncrement(charWidth * horizontalIncrement);
+    }
+
+    private void editButton(JButton button) {
+        button.setBorderPainted(false);
+        button.setBorder(null);
+//button.setFocusable(false);
+        button.setMargin(new Insets(0, 0, 0, 0));
+        button.setContentAreaFilled(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    }
 
 }
