@@ -6,24 +6,24 @@ import javax.swing.text.BadLocationException;
 
 /*
  * Hilfsklasse für das Beschränken von Textfeldern mit maximaler Anzahl an Stellen
- * 
+ *
  * Entwickler:  Jan Schwenger
  */
 public class JTextFieldLimit extends PlainDocument {
 
-	private static final long serialVersionUID = 1L;
-	private int limit;
+    private static final long serialVersionUID = 1L;
+    private int limit;
 
-	public JTextFieldLimit(int limit) {
-		super();
-		this.limit = limit;
-	}
+    public JTextFieldLimit(int limit) {
+        super();
+        this.limit = limit;
+    }
 
-	public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
-		if (str == null)
-			return;
-		if ((getLength() + str.length()) <= limit) {
-			super.insertString(offset, str, attr);
-		}
-	}
+    public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+        if (str == null)
+            return;
+        if ((getLength() + str.length()) <= limit) {
+            super.insertString(offset, str, attr);
+        }
+    }
 }

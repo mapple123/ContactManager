@@ -28,6 +28,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
+import add.ESortOrder;
 import add.JTextFieldLimit;
 import add.Methods;
 import add.MyIcon;
@@ -36,279 +37,298 @@ import classes.nObj;
 import res.Consts;
 
 public class EditNewContactFrame extends JFrame {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private MainFrame frame;
-	private JList list;
-	private ArrayList<Contact> alContacts;
-	private boolean search;
-	private ResourceBundle bundle;
-	private final String[] LABELS;
-	private JLabel[] labels = new JLabel[7];
-	private JTextField[] fields = new JTextField[7];
-	private JPanel[] wrapperPanels = new JPanel[7];
-	private Contact contact;
+    private MainFrame frame;
+    private JList list;
+    private ArrayList<Contact> alContacts;
+    private boolean search;
+    private ResourceBundle bundle;
+    private final String[] LABELS;
+    private JLabel[] labels = new JLabel[7];
+    private JTextField[] fields = new JTextField[7];
+    private JPanel[] wrapperPanels = new JPanel[7];
+    private Contact contact;
 
-	private JSplitPane splitPane;
-	private JScrollPane scrollPaneDetails;
+    private JSplitPane splitPane;
+    private JScrollPane scrollPaneDetails;
 
-	private JPanelContactDetails contactDetails;
+    private JPanelContactDetails contactDetails;
 
-	private DefaultListModel model;
+    private DefaultListModel model;
 
-	public Contact getContact() {
-		return contact;
-	}
+    private ESortOrder eSortOrder;
 
-	public void setContact(Contact contact) {
-		this.contact = contact;
-	}
+    public Contact getContact() {
+        return contact;
+    }
 
-	public EditNewContactFrame(MainFrame frame, JList list, final ArrayList<Contact> allContacts, boolean search,
-			Contact contact, final DefaultListModel model, ResourceBundle bundle) {
-		super();
-		this.search = search;
-		this.list = list;
-		this.frame = frame;
-		this.alContacts = allContacts;
-		this.model = model;
-		this.bundle = bundle;
-		
-		LABELS = new String[]{
-				bundle.getString(Consts.VORNAME),  
-				bundle.getString(Consts.NACHNAME),  
-				bundle.getString(Consts.STRASSENR),  
-				bundle.getString(Consts.PLZORT),  
-				bundle.getString(Consts.LAND), 
-				bundle.getString(Consts.TELEFON),
-				bundle.getString(Consts.MAIL) 
-				};
-		buildPanel(contact);
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
 
-		JButton btnOk = new JButton(bundle.getString(Consts.OK));
-		btnOk.addActionListener(new ActionListener() {
+    public EditNewContactFrame(MainFrame frame, JList list, final ArrayList<Contact> allContacts, boolean search,
+                               Contact contact, final DefaultListModel model, ResourceBundle bundle, ESortOrder eSortOrder) {
+        super();
+        this.search = search;
+        this.list = list;
+        this.frame = frame;
+        this.alContacts = allContacts;
+        this.model = model;
+        this.bundle = bundle;
+        this.eSortOrder = eSortOrder;
+        LABELS = new String[]{
+                bundle.getString(Consts.VORNAME),
+                bundle.getString(Consts.NACHNAME),
+                bundle.getString(Consts.STRASSENR),
+                bundle.getString(Consts.PLZORT),
+                bundle.getString(Consts.LAND),
+                bundle.getString(Consts.TELEFON),
+                bundle.getString(Consts.MAIL)
+        };
+        buildPanel(contact);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String firstName = fields[0].getText().replace(",", "").trim();
-				String lastName = fields[1].getText().replace(",", "").trim();
-				String street = fields[2].getText().replace(",", "").replace(";", "").trim();
-				String ort = fields[3].getText().replace(",", "").replace(";", "").trim();
-				String country = fields[4].getText().replace(",", "").replace(";", "").trim();
-				String phone = fields[5].getText().replace(",", "").trim();
-				String mail = fields[6].getText().replace(",", "").trim();
+        JButton btnOk = new JButton(bundle.getString(Consts.OK));
+        btnOk.addActionListener(new ActionListener() {
 
-				if (contact == null) {
-					if ((firstName.length() == 0 && lastName.length() == 0))
-						//TODO: Strings erstellen
-						JOptionPane.showMessageDialog(EditNewContactFrame.this,
-								"Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
-								JOptionPane.WARNING_MESSAGE);
-					else {
-						Contact contact = Methods.saveContact(
-								new Contact(firstName, lastName, street + ";" + ort + ";" + country, phone, mail));
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String firstName = fields[0].getText().replace(",", "").trim();
+                String lastName = fields[1].getText().replace(",", "").trim();
+                String street = fields[2].getText().replace(",", "").replace(";", "").trim();
+                String ort = fields[3].getText().replace(",", "").replace(";", "").trim();
+                String country = fields[4].getText().replace(",", "").replace(";", "").trim();
+                String phone = fields[5].getText().replace(",", "").trim();
+                String mail = fields[6].getText().replace(",", "").trim();
 
-						if (!search) {
-							DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
-							model.addElement(new nObj(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
-									contact.getFirstName() + " " + contact.getLastName(), contact));
-						}
-						System.out.println("Test");
-						frame.setEnabled(true);
+                if (contact == null) {
+                    if ((firstName.length() == 0 && lastName.length() == 0))
+                        //TODO: Strings erstellen
+                        JOptionPane.showMessageDialog(EditNewContactFrame.this,
+                                "Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
+                                JOptionPane.WARNING_MESSAGE);
+                    else {
+                        Contact contact = Methods.saveContact(
+                                new Contact(firstName, lastName, street + ";" + ort + ";" + country, phone, mail));
 
-						EditNewContactFrame.this.dispose();
-					}
+                        if (!search) {
+                            DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
+                            model.addElement(new nObj(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+                                    contact.getFirstName() + " " + contact.getLastName(), contact));
+                        }
+                        System.out.println("Test");
+                        frame.setEnabled(true);
 
-				} else if (contact != null) {
-					if ((firstName.length() == 0 && lastName.length() == 0))
-						//TODO: Strings erstellen
-						JOptionPane.showMessageDialog(EditNewContactFrame.this,
-								"Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
-								JOptionPane.WARNING_MESSAGE);
-					else {
-						System.out.println("Gespeichert:" + street);
-						File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
-						Methods.editItem(f.getAbsolutePath(), new Contact(firstName, lastName,
-								street + ";" + ort + ";" + country, phone, mail, contact.getId()));
-						frame.setEnabled(true);
+                        File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
+                        Methods.editItem(f.getAbsolutePath(), new Contact(firstName, lastName,
+                                street + ";" + ort + ";" + country, phone, mail, contact.getId()));
+                        frame.setEnabled(true);
+                         allContacts.add(contact);
+                        switch(eSortOrder){
+                            case ASC: CustomMenu.sortAsc(allContacts);
+                                break;
+                            case DESC: CustomMenu.sortDesc(allContacts);
+                                break;
+                        }
+                        DefaultListModel sortedItems = (DefaultListModel) list.getModel();
+                        sortedItems.clear();
+                        sortedItems = frame.filterItems(frame.jtfSearch.getText());
+                        list.setModel(sortedItems);
 
-						DefaultListModel filteredItems = new DefaultListModel<>();
-						EditNewContactFrame.this.alContacts = Methods
-								.readAllContacts(new File(Methods.userHomeDir + Methods.DIR + Methods.FILE));
+                        EditNewContactFrame.this.dispose();
+                    }
 
-						for (int i = 0; i < alContacts.size(); i++) {
-							Contact contact = alContacts.get(i);
+                } else if (contact != null) {
+                    if ((firstName.length() == 0 && lastName.length() == 0))
+                        //TODO: Strings erstellen
+                        JOptionPane.showMessageDialog(EditNewContactFrame.this,
+                                "Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
+                                JOptionPane.WARNING_MESSAGE);
+                    else {
+                        System.out.println("Gespeichert:" + street);
 
-							System.out.println(contact.getId());
-							String firstNameS = alContacts.get(i).getFirstName();
-							String lastNameS = alContacts.get(i).getLastName();
-							nObj obj = new nObj(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
-									firstNameS + " " + lastNameS, contact);
+                        File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
+                        allContacts.remove(contact);
+                        Contact newContact = new Contact(firstName, lastName,
+                                street + ";" + ort + ";" + country, phone, mail, contact.getId());
+                        Methods.editItem(f.getAbsolutePath(), newContact);
+                        System.err.println(newContact.getId());
 
-							filteredItems.addElement(obj);
-						}
+                        allContacts.add(newContact);
 
-						DefaultListModel model = (DefaultListModel) list.getModel();
-						model = filteredItems;
-						list.setModel(model);
-						list.validate();
-						contactDetails.setVisible(false);
-						scrollPaneDetails.setVisible(false);
-						splitPane.setDividerSize(0);
-						
-						EditNewContactFrame.this.dispose();
-					}
-				}
+                        switch(eSortOrder){
+                            case ASC: CustomMenu.sortAsc(allContacts);
+                            break;
+                            case DESC: CustomMenu.sortDesc(allContacts);
+                            break;
+                        }
 
-			}
-		});
 
-		JButton btnCancel = new JButton(bundle.getString(Consts.ABBRECHEN));
-		btnCancel.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				frame.setEnabled(true);
+                        frame.setEnabled(true);
 
-				EditNewContactFrame.this.dispose();
-			}
-		});
+                        DefaultListModel sortedItems = (DefaultListModel) list.getModel();
+                        sortedItems.clear();
+                        sortedItems = frame.filterItems(frame.jtfSearch.getText());
+                        list.setModel(sortedItems);
+                       // list.validate();
+                        contactDetails.setVisible(false);
+                        scrollPaneDetails.setVisible(false);
+                        splitPane.setDividerSize(0);
 
-		JPanel panelWrapper = new JPanel();
-		panelWrapper.setLayout(new GridLayout());
+                        EditNewContactFrame.this.dispose();
+                    }
+                }
 
-		JPanel panelHolderSave = new JPanel();
-		panelHolderSave.setLayout(new FlowLayout(Label.RIGHT));
+            }
+        });
 
-		JPanel panelHolderCancel = new JPanel();
-		panelHolderCancel.setLayout(new FlowLayout(Label.LEFT));
+        JButton btnCancel = new JButton(bundle.getString(Consts.ABBRECHEN));
+        btnCancel.addActionListener(new ActionListener() {
 
-		panelHolderSave.add(btnOk);
-		panelHolderCancel.add(btnCancel);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.setEnabled(true);
 
-		panelWrapper.add(panelHolderCancel);
-		panelWrapper.add(panelHolderSave);
+                EditNewContactFrame.this.dispose();
+            }
+        });
 
-		add(panelWrapper, BorderLayout.SOUTH);
+        JPanel panelWrapper = new JPanel();
+        panelWrapper.setLayout(new GridLayout());
 
-		WindowListener listener = new WindowAdapter() {
-			public void windowClosing(WindowEvent evt) {
-				frame.setEnabled(true);
-			}
-		};
-		addWindowListener(listener);
-		setSize(new Dimension(750, 500));
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setLocationRelativeTo(null);
-		setResizable(false);
-		setVisible(true);
-	}
+        JPanel panelHolderSave = new JPanel();
+        panelHolderSave.setLayout(new FlowLayout(Label.RIGHT));
 
-	private void buildPanel(Contact contact) {
-		setComp();
-		if (contact == null) {
-			setTitle(bundle.getString(Consts.NEUTITEL));
+        JPanel panelHolderCancel = new JPanel();
+        panelHolderCancel.setLayout(new FlowLayout(Label.LEFT));
 
-		} else {
-			setTitle( bundle.getString(Consts.BEARBEITENTITEL));
-			setAllData(contact);
-		}
-	}
+        panelHolderSave.add(btnOk);
+        panelHolderCancel.add(btnCancel);
 
-	private void setComp() {
-		JPanel container = new JPanel();
+        panelWrapper.add(panelHolderCancel);
+        panelWrapper.add(panelHolderSave);
 
-		for (int i = 0; i < labels.length; i++) {
-			labels[i] = new JLabel(LABELS[i]);
-			fields[i] = new JTextField();
+        add(panelWrapper, BorderLayout.SOUTH);
 
-			fields[i].setDocument(new JTextFieldLimit(100));
-			fields[i].setToolTipText(bundle.getString(Consts.LIMITTEXT));
+        WindowListener listener = new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
+                frame.setEnabled(true);
+            }
+        };
+        addWindowListener(listener);
+        setSize(new Dimension(750, 500));
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setVisible(true);
+    }
 
-			labels[i].setPreferredSize(new Dimension(100, 35));
-			fields[i].setPreferredSize(new Dimension(300, 35));
 
-			wrapperPanels[i] = new JPanel();
 
-			wrapperPanels[i].setBackground(new Color(0, 0, 0, 0));
-			wrapperPanels[i].setBorder(new LineBorder(Color.BLACK));
+    private void buildPanel(Contact contact) {
+        setComp();
+        if (contact == null) {
+            setTitle(bundle.getString(Consts.NEUTITEL));
 
-			wrapperPanels[i].add(labels[i]);
-			wrapperPanels[i].add(fields[i]);
+        } else {
+            setTitle(bundle.getString(Consts.BEARBEITENTITEL));
+            setAllData(contact);
+        }
+    }
 
-			container.add(wrapperPanels[i]);
-		}
+    private void setComp() {
+        JPanel container = new JPanel();
 
-		container.setLayout(new GridLayout(0, 1));
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = new JLabel(LABELS[i]);
+            fields[i] = new JTextField();
 
-		add(container, BorderLayout.CENTER);
-	}
+            fields[i].setDocument(new JTextFieldLimit(100));
+            fields[i].setToolTipText(bundle.getString(Consts.LIMITTEXT));
 
-	private void setAllData(Contact data) {
-		String[] adresse = data.getAddress().split(";");
-		String street;
-		String plzOrt;
-		String country;
+            labels[i].setPreferredSize(new Dimension(100, 35));
+            fields[i].setPreferredSize(new Dimension(300, 35));
 
-		if (adresse.length <= 0) {
-			street = "";
-			plzOrt = "";
-			country = "";
-		} else {
-			
-			if (adresse.length == 1 && adresse[0] != null && !adresse[0].isEmpty())
-				street = adresse[0];
-			else
-				street = "";
-			
-			
-			if (adresse.length == 2 && adresse[1] != null && !adresse[1].isEmpty()) {
-				if( adresse[0] != null)
-					street = adresse[0];
-				else 
-					street = "";
-				plzOrt = adresse[1];
-			}
-				
-			else {
-				plzOrt = "";
-			}
-				
-			if (adresse.length == 3 && adresse[2] != null && !adresse[2].isEmpty()) {
-				if( adresse[0] != null  && !adresse[0].isEmpty())
-					street = adresse[0];
-				else 
-					street = "";
-				if( adresse[1] != null  && !adresse[1].isEmpty())
-					plzOrt = adresse[1];
-				else 
-					plzOrt = "";
-				
-				country = adresse[2];
-			}else {
-				country = "";
-			}		
+            wrapperPanels[i] = new JPanel();
 
-		}
-		fields[0].setText(data.getFirstName());
-		fields[1].setText(data.getLastName());
-		fields[2].setText(street);
-		fields[3].setText(plzOrt);
-		fields[4].setText(country);
-		fields[5].setText(data.getPhone());
-		fields[6].setText(data.getMail());
+            wrapperPanels[i].setBackground(new Color(0, 0, 0, 0));
+            wrapperPanels[i].setBorder(new LineBorder(Color.BLACK));
 
-	}
+            wrapperPanels[i].add(labels[i]);
+            wrapperPanels[i].add(fields[i]);
 
-	public void setSplitPane(JSplitPane splitPane) {
-		this.splitPane = splitPane;
-	}
+            container.add(wrapperPanels[i]);
+        }
 
-	public void setScrollPane(JScrollPane scrollPaneDetails) {
-		this.scrollPaneDetails = scrollPaneDetails;
-	}
+        container.setLayout(new GridLayout(0, 1));
 
-	public void setContactDetails(JPanelContactDetails paneDetails) {
-		this.contactDetails = paneDetails;
-	}
+        add(container, BorderLayout.CENTER);
+    }
+
+    private void setAllData(Contact data) {
+        String[] adresse = data.getAddress().split(";");
+        String street;
+        String plzOrt;
+        String country;
+
+        if (adresse.length <= 0) {
+            street = "";
+            plzOrt = "";
+            country = "";
+        } else {
+
+            if (adresse.length == 1 && adresse[0] != null && !adresse[0].isEmpty())
+                street = adresse[0];
+            else
+                street = "";
+
+
+            if (adresse.length == 2 && adresse[1] != null && !adresse[1].isEmpty()) {
+                if (adresse[0] != null)
+                    street = adresse[0];
+                else
+                    street = "";
+                plzOrt = adresse[1];
+            } else {
+                plzOrt = "";
+            }
+
+            if (adresse.length == 3 && adresse[2] != null && !adresse[2].isEmpty()) {
+                if (adresse[0] != null && !adresse[0].isEmpty())
+                    street = adresse[0];
+                else
+                    street = "";
+                if (adresse[1] != null && !adresse[1].isEmpty())
+                    plzOrt = adresse[1];
+                else
+                    plzOrt = "";
+
+                country = adresse[2];
+            } else {
+                country = "";
+            }
+
+        }
+        fields[0].setText(data.getFirstName());
+        fields[1].setText(data.getLastName());
+        fields[2].setText(street);
+        fields[3].setText(plzOrt);
+        fields[4].setText(country);
+        fields[5].setText(data.getPhone());
+        fields[6].setText(data.getMail());
+
+    }
+
+    public void setSplitPane(JSplitPane splitPane) {
+        this.splitPane = splitPane;
+    }
+
+    public void setScrollPane(JScrollPane scrollPaneDetails) {
+        this.scrollPaneDetails = scrollPaneDetails;
+    }
+
+    public void setContactDetails(JPanelContactDetails paneDetails) {
+        this.contactDetails = paneDetails;
+    }
 }

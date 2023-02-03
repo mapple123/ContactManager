@@ -47,7 +47,6 @@ public class Methods {
 				contactDataFile.createNewFile();
 				System.out.println("erstellt");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -58,7 +57,7 @@ public class Methods {
 	}
 	public static Contact saveContact(Contact contact) {
 		File file = new File(userHomeDir + DIR + FILE);
-		FileWriter fw = null;
+		FileWriter fw;
 		String firstName = contact.getFirstName();
 		String lastName = contact.getLastName();
 		String address = contact.getAddress();
@@ -87,7 +86,6 @@ public class Methods {
 	private static ArrayList<Long> getAllIds(File file) {
 		ArrayList<Long> contactIdList = new ArrayList<Long>();
 		try {
-
 			String line;
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
@@ -120,8 +118,8 @@ public class Methods {
 	}
 
 	public static ArrayList<Contact> readAllContacts(File file) {
-		ArrayList<Contact> contactList = new ArrayList<Contact>();
-		Contact contact = null;
+		ArrayList<Contact> contactList = new ArrayList();
+		Contact contact;
 		try {
 
 			String line;

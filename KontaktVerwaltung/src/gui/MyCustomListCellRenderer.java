@@ -22,10 +22,10 @@ public class MyCustomListCellRenderer implements ListCellRenderer<Object> {
 
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 			boolean cellHasFocus) {
-		Font theFont = null;
-		Color theForeground = null;
+		Font theFont;
+		Color theForeground;
 		Icon theIcon = null;
-		String theText = null;
+		String theText;
 		JPanel panel = new JPanel();
 		JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index, isSelected,
 				cellHasFocus);
