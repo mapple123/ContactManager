@@ -15,49 +15,50 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.MatteBorder;
 
-import classes.nObj;
+import classes.ContactExt;
 
+/**
+ * Custom Zelle für die Kontaktliste
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class MyCustomListCellRenderer implements ListCellRenderer<Object> {
 	protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
-
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
 			boolean cellHasFocus) {
-		Font theFont;
-		Color theForeground;
-		Icon theIcon = null;
-		String theText;
+		Font font;
+		Color foreground;
+		Icon icon = null;
+		String text;
 		JPanel panel = new JPanel();
 		JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index, isSelected,
 				cellHasFocus);
-
-		if (value instanceof nObj) {
-			nObj values = (nObj) value;
-			theFont = values.getFont();
-			theForeground = values.getColor();
-			theIcon = values.getMyIcon();
-			theText = values.getName();
+		if (value instanceof ContactExt) {
+			ContactExt values = (ContactExt) value;
+			font = values.getFont();
+			foreground = values.getColor();
+			icon = values.getMyIcon();
+			text = values.getName();
 		} else {
-			theFont = list.getFont();
-			theForeground = list.getForeground();
-			theText = "";
+			font = list.getFont();
+			foreground = list.getForeground();
+			text = "";
 		}
 		if (!isSelected) {
-			renderer.setForeground(theForeground);
-
+			renderer.setForeground(foreground);
 		} else {
 			renderer.setForeground(Color.LIGHT_GRAY);
 			renderer.setBackground(new Color(0, 0, 0, 0));
 			renderer.setBorder(null);
 		}
-		if (theIcon != null) {
-			renderer.setIcon(theIcon);
+		if (icon != null) {
+			renderer.setIcon(icon);
 		}
-		renderer.setText(theText);
-		renderer.setFont(theFont);
+		renderer.setText(text);
+		renderer.setFont(font);
 		renderer.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		renderer.setBackground(new Color(0, 0, 0, 0));
 		panel.setLayout(new FlowLayout(Label.LEFT));
-
 		panel.setBorder(new MatteBorder(2, 0, 0, 0, Color.black));
 		panel.add(renderer);
 		return panel;

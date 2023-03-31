@@ -23,16 +23,23 @@ import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
 import classes.Contact;
-import classes.nObj;
+import classes.ContactExt;
 import gui.MainFrame;
-import main.MainMethod;
 import res.Consts;
 
+/**
+ * Allgemeine Methoden für die Funktionalität der kompletten Anwendung.
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class Methods {
+
+	// TODO: Flexiblen Pfad für das Speichern der Textdateien
 	public static String userHomeDir = "";
 	public static final String DIR = "\\Kontaktverwaltung\\Kontakte";
 	public static final String FILE = "\\Kontaktdaten.txt";
 
+	// Öffentliche Methode zum Konfigurieren und zum Erstellen der Ordnerstruktur der Anwendung
 	public static void setUpMain() {
 		userHomeDir = System.getenv("USERPROFILE");
 		//Locale currentLocale = Locale.getDefault();
@@ -49,12 +56,12 @@ public class Methods {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		}
-
 		new MainFrame(contactDataFile, bundle);
-
 	}
+
+	// Öffentliche Methode zum Speichern eines Kontaktes
+	// Rückgabewert: Objekt -> Kontakt
 	public static Contact saveContact(Contact contact) {
 		File file = new File(userHomeDir + DIR + FILE);
 		FileWriter fw;
@@ -63,7 +70,6 @@ public class Methods {
 		String address = contact.getAddress();
 		String phone = contact.getPhone();
 		String mail = contact.getMail();
-
 		long id = getLastContactId(file);
 		try {
 			fw = new FileWriter(file, true);
@@ -83,6 +89,8 @@ public class Methods {
 		return contact;
 	}
 
+	// Interne Methode zum Bekommen aller Id's
+	// Rückgabewert: ArrayList -> Id's
 	private static ArrayList<Long> getAllIds(File file) {
 		ArrayList<Long> contactIdList = new ArrayList<Long>();
 		try {
@@ -93,20 +101,19 @@ public class Methods {
 				String[] conString = line.split(",");
 				contactIdList.add(Long.parseLong(conString[5]));
 			}
-
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return contactIdList;
 	}
 
+	// Interne Methode zum Bekommen der letzten Kontakt-Id
+	// Rückgabewert: long -> Id
 	private static long getLastContactId(File file) {
 		int c = 0;
 		ArrayList<Contact> aL = readAllContacts(file);
 		int aLSize = aL.size();
-
 		if (aLSize > 0 && getAllIds(file).contains(aL.get(aLSize - 1).getId()))
 			c++;
 		long res = 0;
@@ -117,11 +124,12 @@ public class Methods {
 		return res;
 	}
 
+	// Öffentliche Methode für das Auslesen aller Kontakte
+	// Rückgabewert: ArrayList -> Kontakte
 	public static ArrayList<Contact> readAllContacts(File file) {
 		ArrayList<Contact> contactList = new ArrayList();
 		Contact contact;
 		try {
-
 			String line;
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
@@ -131,17 +139,17 @@ public class Methods {
 						Long.parseLong(conString[5]));
 				contactList.add(contact);
 			}
-
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return contactList;
 	}
 
+	// TODO: Eventuell entfernen, da kein Gebrauch
+	// Öffentliche Testmethode zum bekommen eines bestimmten Kontaktes
+	// Rückgabewert: Objekt -> Kontakt
 	public static Contact readContact(File file, int linePosition) {
-
 		Contact contact = null;
 		String specific_line_n = "";
 		try (Stream<String> all_lines = Files.lines(Paths.get(file.getAbsolutePath()))) {
@@ -151,22 +159,20 @@ public class Methods {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return contact;
 	}
 
-	public static String readAllText(String filename) throws Exception {
+	// Interne Methode für das Bekommen der Informationen eines Kontaktes
+	// Rückgabewert: String -> gespeicherte Daten von einem Kontakt
+	private static String readAllText(String filename) throws Exception {
 		StringBuilder sb = new StringBuilder();
-
 		try {
-
 			String line;
 			FileReader fr = new FileReader(filename);
 			BufferedReader br = new BufferedReader(fr);
 			while ((line = br.readLine()) != null) {
 				sb.append(line + "\n");
 			}
-
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -174,6 +180,8 @@ public class Methods {
 		return sb.toString();
 	}
 
+	// Interne Methode für das Verarbeiten der Informationen eines Kontaktes
+	// Rückgabewert: String -> Verarbeiteter String von den Informationen eines Kontaktes
 	private static String changeFile(String path, long line) {
 		String file;
 		StringBuilder sb = null;
@@ -181,47 +189,44 @@ public class Methods {
 			file = readAllText(path);
 			String[] arr = file.split("\n");
 			sb = new StringBuilder();
-
 			for (String s : arr) {
-
 				String[] sA = s.split(",");
-
 				if (sA[5].equals("" + line))
 					continue;
 				else
 					sb.append(s + "\n");
 			}
 		} catch (Exception e) {
-
 			e.printStackTrace();
 		}
-
 		return sb.toString();
 	}
 
-	public static void writeAllText(String text, String fileout) {
+	// Interne Methode für das Erstellen einer Datei mit den Informationen eines Kontaktes in einem fetsgelegten Pfad
+	private static void writeAllText(String text, String fileout) {
 		try {
 			PrintWriter pw = new PrintWriter(fileout);
 			pw.print(text);
 			pw.close();
 		} catch (Exception e) {
-
 			e.printStackTrace();
 		}
 	}
 
-	public static void deleteItemFile(String filePath, ArrayList<nObj> items) {
-		for (nObj item : items) {
+	// Öffentliche Methode, die für das Löschen der Kontakte zuständig ist
+	public static void deleteItemFile(String filePath, ArrayList<ContactExt> items) {
+		for (ContactExt item : items) {
 			writeAllText(changeFile(filePath, item.getContact().getId()), filePath);
 		}
 	}
 
+	// Öffentliche Methode, die für das Bearbeiten eines Kontakes zuständig ist
 	public static void editItem(String filePath, Contact item) {
-
 		writeAllText(changeFile2(filePath, item.getId(), item), filePath);
-
 	}
 
+	// Interne Methode für das Verarbeiten der Informationen eines Kontaktes
+	// Rückgabewert: String -> Verarbeiteter String von den Informationen eines Kontaktes
 	private static String changeFile2(String path, long line, Contact c) {
 		String file;
 		StringBuilder sb = null;
@@ -229,28 +234,23 @@ public class Methods {
 			file = readAllText(path);
 			String[] arr = file.split("\n");
 			sb = new StringBuilder();
-
 			for (String s : arr) {
-
 				String[] sA = s.split(",");
-
 				if (sA[5].equals("" + line)) {
 					System.err.println(s);
 					sb.append(c.getFirstName() + "," + c.getLastName() + "," + c.getAddress() + "," + c.getPhone() + ","
 							+ c.getMail() + "," + c.getId() + "\n");
 				} else
 					sb.append(s + "\n");
-
 			}
 		} catch (Exception e) {
-
 			e.printStackTrace();
 		}
-
 		return sb.toString();
 	}
 	
-	
+
+	// TODO: Weitere Funktionalität für die Konfigurationsdatei implementieren inklusive Kommentare
 	public static void writeConfig(List<Contact> contacts, String mP) throws Exception
 	{
 		FileOutputStream file = new FileOutputStream("bgSave.enc");

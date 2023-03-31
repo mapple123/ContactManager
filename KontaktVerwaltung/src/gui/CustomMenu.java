@@ -2,50 +2,39 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.time.Clock;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 import add.ESortOrder;
 import add.Methods;
-import add.MyIcon;
 import classes.Contact;
-import classes.nObj;
+import classes.ContactExt;
 import res.Consts;
 
 import static add.ESortOrder.ASC;
 import static add.ESortOrder.DESC;
 
+/**
+ * Custom Menü für das Hauptprogramm
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class CustomMenu extends JMenuBar implements ActionListener , ItemListener {
-
     private static final long serialVersionUID = 1L;
     private JMenuBar menuBar;
-    private JMenu menu, menu2, menu3, submenu;
-    private JMenuItem menuItem, menuItem2, menuItem3;
-
+    private JMenu menuNew, menuFilterSort, menuDelete, submenuSorting;
+    private JMenuItem menuItemDelete, menuItemNew, menuItem3;
     private MainFrame frame;
-
     private String path;
-
     private JList<?> list;
     private ArrayList<Contact> allContacts;
     private JPanelContactDetails panelDetails;
     private JSplitPane splitPane;
     private JScrollPane scrollPaneDetails;
     private ResourceBundle bundle;
-
     private boolean search;
-
-    protected JRadioButtonMenuItem rbMenuItem, rbMenuItem2, rbMenuItem3, rbMenuItem4;
-
-    protected boolean basc = false, bdesc = false;
-
+    protected JRadioButtonMenuItem rbMenuItemSortASC, rbMenuItemSortDESC, rbMenuItemSortLastNameASC, rbMenuItemSortLastNameDESC;
     public CustomMenu(MainFrame frame, JList<?> list, ArrayList<Contact> allContacts, String path,
                       JPanelContactDetails panelDetails, JSplitPane splitPane, JScrollPane scrollPaneDetails, ResourceBundle bundle) {
         this.path = path;
@@ -56,116 +45,107 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
         this.splitPane = splitPane;
         this.scrollPaneDetails = scrollPaneDetails;
         this.bundle = bundle;
+
         menuBar = new JMenuBar();
 
-        menu = new JMenu(bundle.getString(Consts.NEU));
-        menu.setFont(new Font("Arial", Font.PLAIN, 30));
-        menu.setMnemonic(KeyEvent.VK_N);
+        // Menü "Neu"
+        menuNew = new JMenu(bundle.getString(Consts.NEU));
+        menuNew.setFont(new Font("Arial", Font.PLAIN, 30));
+        menuNew.setMnemonic(KeyEvent.VK_N);
 
-        menuBar.add(menu);
+        menuBar.add(menuNew);
 
-        menu3 = new JMenu(bundle.getString(Consts.LOESCHEN));
-        menu3.setFont(new Font("Arial", Font.PLAIN, 30));
-        menu3.setMnemonic(KeyEvent.VK_L);
+        // Menü "Löschen"
+        menuDelete = new JMenu(bundle.getString(Consts.LOESCHEN));
+        menuDelete.setFont(new Font("Arial", Font.PLAIN, 30));
+        menuDelete.setMnemonic(KeyEvent.VK_L);
 
-        menuBar.add(menu3);
+        menuBar.add(menuDelete);
 
-        menuItem = new JMenuItem(bundle.getString(Consts.SUBLOESCHEN), KeyEvent.VK_J);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.ALT_MASK));
+        // Submenü "Löschen"
+        menuItemDelete = new JMenuItem(bundle.getString(Consts.SUBLOESCHEN), KeyEvent.VK_J);
+        menuItemDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.ALT_MASK));
+        menuItemDelete.addActionListener(this);
+        menuDelete.add(menuItemDelete);
 
-        menuItem.addActionListener(this);
-        menu3.add(menuItem);
+        // Submenü neuen Kontakt erstellen
+        menuItemNew = new JMenuItem(bundle.getString(Consts.NEUTITEL), KeyEvent.VK_P);
+        menuItemNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
+        menuItemNew.addActionListener(this);
+        menuNew.add(menuItemNew);
 
-        menuItem2 = new JMenuItem(bundle.getString(Consts.NEUTITEL), KeyEvent.VK_P);
-        menuItem2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
-
-        menuItem2.addActionListener(this);
-        menu.add(menuItem2);
-
-        menu2 = new JMenu(bundle.getString(Consts.FILERSORTIEREN));
-        menu2.setFont(new Font("Arial", Font.PLAIN, 30));
-        menu2.setMnemonic(KeyEvent.VK_R);
-        menu2.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
+        // Menü Filter/Sortieren
+        menuFilterSort = new JMenu(bundle.getString(Consts.FILERSORTIEREN));
+        menuFilterSort.setFont(new Font("Arial", Font.PLAIN, 30));
+        menuFilterSort.setMnemonic(KeyEvent.VK_R);
+        menuFilterSort.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
         menuBar.add(Box.createHorizontalGlue());
 
-       /* menuItem3 = new JMenuItem(bundle.getString(Consts.SORTIEREN), KeyEvent.VK_P);
-        menuItem3.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
+        ButtonGroup groupSorting = new ButtonGroup();
 
-        menuItem3.addActionListener(this);*/
+        // Radiobutton nach Vorname Asc sortieren
+        rbMenuItemSortASC = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENASC));
+        rbMenuItemSortASC.setSelected(true);
+        rbMenuItemSortASC.setMnemonic(KeyEvent.VK_R);
+        groupSorting.add(rbMenuItemSortASC);
 
-        //a group of radio button menu items
+        // Radiobutton nach Vorname Desc sortieren
+        rbMenuItemSortDESC = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENDESC));
+        rbMenuItemSortDESC.setMnemonic(KeyEvent.VK_R);
+        groupSorting.add(rbMenuItemSortDESC);
 
-        ButtonGroup group = new ButtonGroup();
-        rbMenuItem = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENASC));
-        rbMenuItem.setSelected(true);
-        rbMenuItem.setMnemonic(KeyEvent.VK_R);
-        group.add(rbMenuItem);
+        // Radiobutton nach Nachname Asc sortieren
+        rbMenuItemSortLastNameASC = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENLASTASC));
+        rbMenuItemSortLastNameASC.setMnemonic(KeyEvent.VK_R);
+        groupSorting.add(rbMenuItemSortLastNameASC);
 
-        rbMenuItem2 = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENDESC));
+        // Radiobutton nach Nachname Desc sortieren
+        rbMenuItemSortLastNameDESC = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENLASTDESC));
+        rbMenuItemSortLastNameDESC.setMnemonic(KeyEvent.VK_R);
+        groupSorting.add(rbMenuItemSortLastNameDESC);
 
-        rbMenuItem2.setMnemonic(KeyEvent.VK_R);
-        group.add(rbMenuItem2);
+        // Hinzufügen des Itemlisteners
+        rbMenuItemSortASC.addItemListener(this);
+        rbMenuItemSortDESC.addItemListener(this);
+        rbMenuItemSortLastNameASC.addItemListener(this);
+        rbMenuItemSortLastNameDESC.addItemListener(this);
 
-        rbMenuItem3 = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENLASTASC));
+        // Zum Menü Filtern/Sortieren hinzufügen
+        submenuSorting = new JMenu(bundle.getString(Consts.SORTIEREN));
+        submenuSorting.setMnemonic(KeyEvent.VK_S);
+        submenuSorting.add(rbMenuItemSortASC);
+        submenuSorting.add(rbMenuItemSortDESC);
+        submenuSorting.add(rbMenuItemSortLastNameASC);
+        submenuSorting.add(rbMenuItemSortLastNameDESC);
+        menuFilterSort.add(submenuSorting);
 
-        rbMenuItem3.setMnemonic(KeyEvent.VK_R);
-        group.add(rbMenuItem3);
-
-        rbMenuItem4 = new JRadioButtonMenuItem(bundle.getString(Consts.SUBSORTIERENLASTDESC));
-
-        rbMenuItem4.setMnemonic(KeyEvent.VK_R);
-        group.add(rbMenuItem4);
-
-        rbMenuItem.addItemListener(this);
-        rbMenuItem2.addItemListener(this);
-        rbMenuItem3.addItemListener(this);
-        rbMenuItem4.addItemListener(this);
-        //menu2.add(menuItem3);
-        menu2.add(rbMenuItem);
-        menu2.add(rbMenuItem2);
-        menu2.add(rbMenuItem3);
-        menu2.add(rbMenuItem4);
-
-        submenu = new JMenu(bundle.getString(Consts.SORTIEREN));
-        submenu.setMnemonic(KeyEvent.VK_S);
-
-
-        submenu.add(rbMenuItem);
-        submenu.add(rbMenuItem2);
-        submenu.add(rbMenuItem3);
-        submenu.add(rbMenuItem4);
-        menu2.add(submenu);
-
-        menuBar.add(menu2);
-
+        menuBar.add(menuFilterSort);
         frame.setJMenuBar(menuBar);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         ESortOrder eSortOrder = null;
-        if (rbMenuItem.isSelected())
+        if (rbMenuItemSortASC.isSelected())
             eSortOrder = ASC;
-        else if(rbMenuItem2.isSelected())
+        else if(rbMenuItemSortDESC.isSelected())
             eSortOrder = DESC;
-        if (e.getSource() == menuItem2) {
+        if (e.getSource() == menuItemNew) {
             frame.setEnabled(false);
             EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, allContacts, search, null, null, bundle, eSortOrder);
             eFrame.setContact(null);
-        } else if (e.getSource() == menuItem) {
+        } else if (e.getSource() == menuItemDelete) {
             if (list.getSelectedIndices().length > 0) {
                 System.out.println("Löschen");
-                ArrayList<nObj> li = new ArrayList<>();
+                ArrayList<ContactExt> li = new ArrayList<>();
                 for (Object item : list.getSelectedValuesList()) {
-                    li.add((nObj) item);
+                    li.add((ContactExt) item);
                 }
                 System.out.println(li.size());
                 Methods.deleteItemFile(path, li);
                 DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
-
                 if (list.getSelectedIndices().length > 0) {
                     int[] alIn = list.getSelectedIndices();
-
                     for (int i = alIn.length - 1; i >= 0; i--) {
                         model.removeElementAt(alIn[i]);
                     }
@@ -174,53 +154,37 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
                     scrollPaneDetails.setVisible(false);
                     splitPane.setDividerSize(0);
                 }
-
             }  else {
                 //TODO: Strings erstellen in Consts und in Textbundle
                 JOptionPane.showMessageDialog(frame, "Achtung", "Kein Eintrag egal", JOptionPane.WARNING_MESSAGE);
             }
         }
-
     }
-
     public boolean isSearch() {
         return search;
     }
-
     public void setSearch(boolean search) {
         this.search = search;
     }
-
-
-
     @Override
     public void itemStateChanged(ItemEvent e) {
-
-        if(e.getSource() == rbMenuItem && e.getStateChange() == ItemEvent.SELECTED){
-
+        if(e.getSource() == rbMenuItemSortASC && e.getStateChange() == ItemEvent.SELECTED){
             sortAsc(allContacts);
-
-
-
-        }else if(e.getSource() == rbMenuItem2 && e.getStateChange() == ItemEvent.SELECTED){
-            //Collections.reverseOrder((Comparator<Contact>) (o1, o2) -> o1.getFirstName().compareTo(o2.getFirstName()));
+        }else if(e.getSource() == rbMenuItemSortDESC && e.getStateChange() == ItemEvent.SELECTED){
             sortDesc(allContacts);
+        } else if(e.getSource() == rbMenuItemSortLastNameASC && e.getStateChange() == ItemEvent.SELECTED){
 
-        } else if(e.getSource() == rbMenuItem3 && e.getStateChange() == ItemEvent.SELECTED){
-
-        }else if(e.getSource() == rbMenuItem4 && e.getStateChange() == ItemEvent.SELECTED){
+        }else if(e.getSource() == rbMenuItemSortLastNameDESC && e.getStateChange() == ItemEvent.SELECTED){
 
         }
-         DefaultListModel sortedItems = (DefaultListModel) list.getModel();
+        DefaultListModel sortedItems = (DefaultListModel) list.getModel();
         sortedItems.clear();
         sortedItems = frame.filterItems(frame.jtfSearch.getText());
         list.setModel(sortedItems);
-
     }
 
     protected static void sortAsc(ArrayList<Contact> allContacts){
         Collections.sort(allContacts, new Comparator<Contact>(){
-
             public int compare(Contact o1, Contact o2)
             {
                 return o1.getFirstName().compareToIgnoreCase(o2.getFirstName());
@@ -229,7 +193,6 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
     }
     protected static void sortDesc(ArrayList<Contact> allContacts){
         Collections.sort(allContacts, new Comparator<Contact>(){
-
             public int compare(Contact o1, Contact o2)
             {
                 return o2.getFirstName().compareToIgnoreCase(o1.getFirstName());

@@ -5,15 +5,19 @@ import java.awt.Font;
 
 import add.MyIcon;
 
-public class nObj {
-
+/**
+ * Erweiterte Kontaktklasse inklusive weiterer Attribute
+ *
+ * Entwickler: Jan Schwenger
+ */
+public class ContactExt {
     private Font font;
     private Color color;
     private MyIcon myIcon;
     private String name;
     private Contact contact;
 
-    public nObj(Font font, Color color, MyIcon myIcon, String name, Contact contact) {
+    public ContactExt(Font font, Color color, MyIcon myIcon, String name, Contact contact) {
         this.font = font;
         this.color = color;
         this.myIcon = myIcon;

@@ -1,5 +1,10 @@
 package res;
 
+/**
+ * Klasse für alle wichtigen Konstanten
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class Consts {
 	public static final String TITEL = "programmTitel";
 	public static final String BEARBEITENTITEL = "benutzerBearbeitenTitel";

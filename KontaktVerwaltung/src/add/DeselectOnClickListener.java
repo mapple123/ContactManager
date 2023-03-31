@@ -11,6 +11,12 @@ import javax.swing.JSplitPane;
 
 import gui.JPanelContactDetails;
 
+/**
+ * Hilfsklasse für das Deselektieren der Kontaktliste, sobald in das Fenster geklickt wird und nicht die
+ * Liste.
+ * 
+ * Entwickler: Jan Schwenger
+ */
 public class DeselectOnClickListener extends MouseAdapter {
 
     private JPanelContactDetails jPanelContactDetails;

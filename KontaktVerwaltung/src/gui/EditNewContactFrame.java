@@ -33,47 +33,41 @@ import add.JTextFieldLimit;
 import add.Methods;
 import add.MyIcon;
 import classes.Contact;
-import classes.nObj;
+import classes.ContactExt;
 import res.Consts;
 
+/**
+ * Diese Klasse repräsentiert das Fenster, um neue Kontakte anzulegen und zusätzlich um vorhandene Kontakte zu
+ * bearbeiten
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class EditNewContactFrame extends JFrame {
     private static final long serialVersionUID = 1L;
-
-    private MainFrame frame;
-    private JList list;
-    private ArrayList<Contact> alContacts;
-    private boolean search;
+    private MainFrame mainFrame;
+    private JList contactList;
+    private ArrayList<Contact> allContacts;
+    private boolean searchState;
     private ResourceBundle bundle;
     private final String[] LABELS;
     private JLabel[] labels = new JLabel[7];
     private JTextField[] fields = new JTextField[7];
     private JPanel[] wrapperPanels = new JPanel[7];
     private Contact contact;
-
     private JSplitPane splitPane;
     private JScrollPane scrollPaneDetails;
-
     private JPanelContactDetails contactDetails;
-
     private DefaultListModel model;
-
     private ESortOrder eSortOrder;
 
-    public Contact getContact() {
-        return contact;
-    }
 
-    public void setContact(Contact contact) {
-        this.contact = contact;
-    }
-
-    public EditNewContactFrame(MainFrame frame, JList list, final ArrayList<Contact> allContacts, boolean search,
+    public EditNewContactFrame(MainFrame mainFrame, JList contactList, final ArrayList<Contact> allContacts, boolean searchState,
                                Contact contact, final DefaultListModel model, ResourceBundle bundle, ESortOrder eSortOrder) {
         super();
-        this.search = search;
-        this.list = list;
-        this.frame = frame;
-        this.alContacts = allContacts;
+        this.searchState = searchState;
+        this.contactList = contactList;
+        this.mainFrame = mainFrame;
+        this.allContacts = allContacts;
         this.model = model;
         this.bundle = bundle;
         this.eSortOrder = eSortOrder;
@@ -101,6 +95,7 @@ public class EditNewContactFrame extends JFrame {
                 String phone = fields[5].getText().replace(",", "").trim();
                 String mail = fields[6].getText().replace(",", "").trim();
 
+                // Zuständig für das Abspeichern eines neuen Kontaktes
                 if (contact == null) {
                     if ((firstName.length() == 0 && lastName.length() == 0))
                         //TODO: Strings erstellen
@@ -111,34 +106,34 @@ public class EditNewContactFrame extends JFrame {
                         Contact contact = Methods.saveContact(
                                 new Contact(firstName, lastName, street + ";" + ort + ";" + country, phone, mail));
 
-                        if (!search) {
-                            DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
-                            model.addElement(new nObj(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+                        if (!searchState) {
+                            DefaultListModel<Object> model = (DefaultListModel<Object>) contactList.getModel();
+                            model.addElement(new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
                                     contact.getFirstName() + " " + contact.getLastName(), contact));
                         }
                         System.out.println("Test");
-                        frame.setEnabled(true);
+                        mainFrame.setEnabled(true);
 
                         File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
                         Methods.editItem(f.getAbsolutePath(), new Contact(firstName, lastName,
                                 street + ";" + ort + ";" + country, phone, mail, contact.getId()));
-                        frame.setEnabled(true);
-                         allContacts.add(contact);
+                        mainFrame.setEnabled(true);
+                        allContacts.add(contact);
                         switch(eSortOrder){
                             case ASC: CustomMenu.sortAsc(allContacts);
                                 break;
                             case DESC: CustomMenu.sortDesc(allContacts);
                                 break;
                         }
-                        DefaultListModel sortedItems = (DefaultListModel) list.getModel();
+                        DefaultListModel sortedItems = (DefaultListModel) contactList.getModel();
                         sortedItems.clear();
-                        sortedItems = frame.filterItems(frame.jtfSearch.getText());
-                        list.setModel(sortedItems);
+                        sortedItems = mainFrame.filterItems(mainFrame.jtfSearch.getText());
+                        contactList.setModel(sortedItems);
 
                         EditNewContactFrame.this.dispose();
                     }
 
-                } else if (contact != null) {
+                } else if (contact != null) { // Zuständig für das Abspeichern eines Kontaktes, der bearbeitet wurde
                     if ((firstName.length() == 0 && lastName.length() == 0))
                         //TODO: Strings erstellen
                         JOptionPane.showMessageDialog(EditNewContactFrame.this,
@@ -163,15 +158,13 @@ public class EditNewContactFrame extends JFrame {
                             break;
                         }
 
+                        mainFrame.setEnabled(true);
 
-
-                        frame.setEnabled(true);
-
-                        DefaultListModel sortedItems = (DefaultListModel) list.getModel();
+                        DefaultListModel sortedItems = (DefaultListModel) contactList.getModel();
                         sortedItems.clear();
-                        sortedItems = frame.filterItems(frame.jtfSearch.getText());
-                        list.setModel(sortedItems);
-                       // list.validate();
+                        sortedItems = mainFrame.filterItems(mainFrame.jtfSearch.getText());
+                        contactList.setModel(sortedItems);
+
                         contactDetails.setVisible(false);
                         scrollPaneDetails.setVisible(false);
                         splitPane.setDividerSize(0);
@@ -188,8 +181,7 @@ public class EditNewContactFrame extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                frame.setEnabled(true);
-
+                mainFrame.setEnabled(true);
                 EditNewContactFrame.this.dispose();
             }
         });
@@ -213,7 +205,7 @@ public class EditNewContactFrame extends JFrame {
 
         WindowListener listener = new WindowAdapter() {
             public void windowClosing(WindowEvent evt) {
-                frame.setEnabled(true);
+                mainFrame.setEnabled(true);
             }
         };
         addWindowListener(listener);
@@ -223,23 +215,18 @@ public class EditNewContactFrame extends JFrame {
         setResizable(false);
         setVisible(true);
     }
-
-
-
     private void buildPanel(Contact contact) {
-        setComp();
+        setComponents();
         if (contact == null) {
             setTitle(bundle.getString(Consts.NEUTITEL));
-
         } else {
             setTitle(bundle.getString(Consts.BEARBEITENTITEL));
             setAllData(contact);
         }
     }
 
-    private void setComp() {
+    private void setComponents() {
         JPanel container = new JPanel();
-
         for (int i = 0; i < labels.length; i++) {
             labels[i] = new JLabel(LABELS[i]);
             fields[i] = new JTextField();
@@ -260,9 +247,7 @@ public class EditNewContactFrame extends JFrame {
 
             container.add(wrapperPanels[i]);
         }
-
         container.setLayout(new GridLayout(0, 1));
-
         add(container, BorderLayout.CENTER);
     }
 
@@ -277,13 +262,10 @@ public class EditNewContactFrame extends JFrame {
             plzOrt = "";
             country = "";
         } else {
-
             if (adresse.length == 1 && adresse[0] != null && !adresse[0].isEmpty())
                 street = adresse[0];
             else
                 street = "";
-
-
             if (adresse.length == 2 && adresse[1] != null && !adresse[1].isEmpty()) {
                 if (adresse[0] != null)
                     street = adresse[0];
@@ -293,7 +275,6 @@ public class EditNewContactFrame extends JFrame {
             } else {
                 plzOrt = "";
             }
-
             if (adresse.length == 3 && adresse[2] != null && !adresse[2].isEmpty()) {
                 if (adresse[0] != null && !adresse[0].isEmpty())
                     street = adresse[0];
@@ -308,7 +289,6 @@ public class EditNewContactFrame extends JFrame {
             } else {
                 country = "";
             }
-
         }
         fields[0].setText(data.getFirstName());
         fields[1].setText(data.getLastName());
@@ -317,7 +297,6 @@ public class EditNewContactFrame extends JFrame {
         fields[4].setText(country);
         fields[5].setText(data.getPhone());
         fields[6].setText(data.getMail());
-
     }
 
     public void setSplitPane(JSplitPane splitPane) {
@@ -331,4 +310,12 @@ public class EditNewContactFrame extends JFrame {
     public void setContactDetails(JPanelContactDetails paneDetails) {
         this.contactDetails = paneDetails;
     }
+    public Contact getContact() {
+        return contact;
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
+
 }

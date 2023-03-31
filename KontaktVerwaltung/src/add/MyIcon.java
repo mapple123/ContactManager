@@ -6,6 +6,11 @@ import java.awt.Graphics;
 
 import javax.swing.Icon;
 
+/**
+ * Hilfsklasse für das Standardicon, sofern kein eigenes Bild für einen Kontakt hinterlegt wurde
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class MyIcon implements Icon {
 
     public MyIcon() {

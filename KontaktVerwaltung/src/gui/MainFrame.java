@@ -7,7 +7,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -18,36 +17,31 @@ import add.DeselectOnClickListener;
 import add.Methods;
 import add.MyIcon;
 import classes.Contact;
-import classes.nObj;
+import classes.ContactExt;
 import res.Consts;
 
+/**
+ * Das ist das Hauptfenster des Programmes
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class MainFrame extends JFrame implements ComponentListener{
-
     private static final long serialVersionUID = 1L;
-
-    private Container mainpane;
-
+    private Container mainPane;
     private JList<Object> listFiles;
     private JScrollPane scrollPane, scrollPaneDetails;
-
     private CustomMenu menuBar;
     private JPanelContactDetails jPanelContactDetails;
-
     private Dimension screenSize;
     private int width;
     private int height;
     private File file;
     protected JTextField jtfSearch;
     private ArrayList<Contact> allContacts;
-
     private DefaultListModel model;
-
-    private JSplitPane splitpane;
+    private JSplitPane splitPane;
     private ResourceBundle bundle;
 
-    protected CustomMenu getCustomMenu(){
-        return menuBar;
-    }
     public MainFrame(File file, ResourceBundle bundle) {
         super(bundle.getString(Consts.TITEL));
         setExtendedState(MAXIMIZED_BOTH);
@@ -67,13 +61,11 @@ public class MainFrame extends JFrame implements ComponentListener{
     private void initComponents() {
         allContacts = Methods.readAllContacts(file);
         Object elements[] = getAllContacts();
-
         listFiles = new JList<Object>();
         model = new DefaultListModel<>();
         for (Object item : elements) {
             model.addElement(item);
         }
-
         listFiles.setModel(model);
 
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -82,13 +74,12 @@ public class MainFrame extends JFrame implements ComponentListener{
 
         jPanelContactDetails = new JPanelContactDetails(listFiles, this, allContacts, false, model, bundle);
 
-        mainpane = getContentPane();
-
+        mainPane = getContentPane();
     }
 
     private void setComponents() {
-        mainpane.setLayout(new BorderLayout());
-        mainpane.setSize(width, height);
+        mainPane.setLayout(new BorderLayout());
+        mainPane.setSize(width, height);
 
         MyCustomListCellRenderer renderer = new MyCustomListCellRenderer();
         listFiles.setCellRenderer(renderer);
@@ -98,20 +89,17 @@ public class MainFrame extends JFrame implements ComponentListener{
 
         jPanelContactDetails.setPreferredSize(new Dimension(660, height));
 
-        splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, jPanelContactDetails);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, jPanelContactDetails);
         jPanelContactDetails.setScrollPane(scrollPaneDetails);
-        jPanelContactDetails.setSplitPane(splitpane);
-        listFiles.addMouseListener(new DeselectOnClickListener(jPanelContactDetails, splitpane, scrollPaneDetails));
+        jPanelContactDetails.setSplitPane(splitPane);
+        listFiles.addMouseListener(new DeselectOnClickListener(jPanelContactDetails, splitPane, scrollPaneDetails));
 
+        splitPane.setContinuousLayout(true);
 
-        splitpane.setContinuousLayout(true);
-
-
-        splitpane.setResizeWeight(0.5);
-        splitpane.setDividerSize(0);
-        splitpane.setDividerLocation(scrollPane.getLocation().x + (int) (getContentPane().getSize().getWidth() / 2));// jPanelContactDetails.getPreferredSize().width
+        splitPane.setResizeWeight(0.5);
+        splitPane.setDividerSize(0);
+        splitPane.setDividerLocation(scrollPane.getLocation().x + (int) (getContentPane().getSize().getWidth() / 2));// jPanelContactDetails.getPreferredSize().width
         listFiles.addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 System.out.println("First index: " + listSelectionEvent.getFirstIndex());
@@ -120,7 +108,6 @@ public class MainFrame extends JFrame implements ComponentListener{
                 System.out.println(", Adjusting? " + adjust);
                 if (!adjust) {
                     jPanelContactDetails.setVisible(true);
-
                     JList list = (JList) listSelectionEvent.getSource();
                     list.setSelectionMode(DefaultListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                     int selections[] = list.getSelectedIndices();
@@ -130,75 +117,42 @@ public class MainFrame extends JFrame implements ComponentListener{
                             System.out.println(" Selections: ");
                         }
                         System.out
-                                .println(selections[i] + "/" + ((nObj) selectionValues[i]).getContact().getId() + " ");
+                                .println(selections[i] + "/" + ((ContactExt) selectionValues[i]).getContact().getId() + " ");
+                        System.out.println(((ContactExt) selectionValues[i]).getContact().toString());
 
-
-                        System.out.println(((nObj) selectionValues[i]).getContact().toString());
-
-                        splitpane.setDividerSize(10);
-                        splitpane.setDividerLocation(
+                        splitPane.setDividerSize(10);
+                        splitPane.setDividerLocation(
                                 scrollPane.getLocation().x + (int) (getContentPane().getSize().getWidth() / 2));// jPanelContactDetails.getPreferredSize().width
-                        System.out.println("WIDTH:" + mainpane.getWidth());
+                        System.out.println("WIDTH:" + mainPane.getWidth());
 
                         if (i < n) {
-                            jPanelContactDetails.setContact(((nObj) selectionValues[i]).getContact());
-                            jPanelContactDetails.setAllData(((nObj) selectionValues[i]).getContact());
+                            jPanelContactDetails.setContact(((ContactExt) selectionValues[i]).getContact());
+                            jPanelContactDetails.setAllData(((ContactExt) selectionValues[i]).getContact());
                         }
-
-
                     }
                 }
             }
         });
-
-
-
-        menuBar = new CustomMenu(this, listFiles, allContacts, file.getAbsolutePath(), jPanelContactDetails, splitpane,
-                scrollPaneDetails, bundle);
+        menuBar = new CustomMenu(this, listFiles, allContacts, file.getAbsolutePath(), jPanelContactDetails,
+                splitPane, scrollPaneDetails, bundle);
         jtfSearch = new JTextField();
         jtfSearch.setPreferredSize(new Dimension(300, 35));
         jtfSearch.getDocument().addDocumentListener(new DocumentListener() {
-
             @Override
             public void removeUpdate(DocumentEvent e) {
-
                 searchFilter(jtfSearch.getText());
-                if (jtfSearch.getText().length() == 0) {
-                    menuBar.setSearch(false);
-                } else {
-                    menuBar.setSearch(true);
-                }
-                jPanelContactDetails.setVisible(false);
-                scrollPaneDetails.setVisible(false);
-                splitpane.setDividerSize(0);
+                hideContactDetails();
             }
-
             @Override
             public void insertUpdate(DocumentEvent e) {
-
                 searchFilter(jtfSearch.getText());
-                if (jtfSearch.getText().length() == 0) {
-                    menuBar.setSearch(false);
-                } else {
-                    menuBar.setSearch(true);
-                }
-                jPanelContactDetails.setVisible(false);
-                scrollPaneDetails.setVisible(false);
-                splitpane.setDividerSize(0);
+                hideContactDetails();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
                 searchFilter(jtfSearch.getText());
-                if (jtfSearch.getText().length() == 0) {
-                    menuBar.setSearch(false);
-                } else {
-                    menuBar.setSearch(true);
-
-                    jPanelContactDetails.setVisible(false);
-                    scrollPaneDetails.setVisible(false);
-                    splitpane.setDividerSize(0);
-                }
+                hideContactDetails();
             }
         });
         JButton btnSearch = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
@@ -211,13 +165,10 @@ public class MainFrame extends JFrame implements ComponentListener{
         btnSearch.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnSearch.setToolTipText(bundle.getString(Consts.SUCHEN));
         btnSearch.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 searchFilter(jtfSearch.getText());
-                jPanelContactDetails.setVisible(false);
-                scrollPaneDetails.setVisible(false);
-                splitpane.setDividerSize(0);
+                hideContactDetails();
             }
         });
 
@@ -226,75 +177,70 @@ public class MainFrame extends JFrame implements ComponentListener{
         panelNorthContainer.add(jtfSearch);
         panelNorthContainer.add(btnSearch);
 
-        mainpane.add(panelNorthContainer, BorderLayout.NORTH);
-        mainpane.add(splitpane, BorderLayout.CENTER);
+        mainPane.add(panelNorthContainer, BorderLayout.NORTH);
+        mainPane.add(splitPane, BorderLayout.CENTER);
     }
 
     private Object[] getAllContacts() {
         this.allContacts = Methods.readAllContacts(file);
         Object elements[] = new Object[allContacts.size()];
-
         for (int i = 0; i < elements.length; i++) {
             Contact contact = allContacts.get(i);
-
             System.out.println(contact.getId());
             String firstName = allContacts.get(i).getFirstName();
             String lastName = allContacts.get(i).getLastName();
-            elements[i] = new nObj(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+            elements[i] = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
                     firstName + " " + lastName, contact);
         }
-
         return elements;
     }
-
     private void searchFilter(String searchItem) {
-
+        if (jtfSearch.getText().length() == 0) {
+            menuBar.setSearch(false);
+        } else {
+            menuBar.setSearch(true);
+        }
         model = filterItems(searchItem);
         listFiles.setModel(model);
     }
 
     protected DefaultListModel filterItems(String searchItem){
         DefaultListModel filteredItems = new DefaultListModel<>();
-        //this.allContacts = Methods.readAllContacts(file);
-
         for (int i = 0; i < allContacts.size(); i++) {
             Contact contact = allContacts.get(i);
-
-
             String firstName = allContacts.get(i).getFirstName();
             String lastName = allContacts.get(i).getLastName();
-            nObj obj = new nObj(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+            ContactExt obj = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
                     firstName + " " + lastName, contact);
-
             String name = contact.getFirstName().toLowerCase() + " " + contact.getLastName().toLowerCase();
             if (name.contains(searchItem.toLowerCase())) {
                 filteredItems.addElement(obj);
-
-
             }
         }
-
-
         return filteredItems;
     }
-
     @Override
     public void componentResized(ComponentEvent e) {
         //System.out.println(this.getSize().height);
     }
-
     @Override
     public void componentMoved(ComponentEvent e) {
 
     }
-
     @Override
     public void componentShown(ComponentEvent e) {
 
     }
-
     @Override
     public void componentHidden(ComponentEvent e) {
 
+    }
+    protected CustomMenu getCustomMenu(){
+        return menuBar;
+    }
+    private void hideContactDetails(){
+        jPanelContactDetails.setVisible(false);
+        scrollPaneDetails.setVisible(false);
+        splitPane.setDividerSize(0);
     }
 }

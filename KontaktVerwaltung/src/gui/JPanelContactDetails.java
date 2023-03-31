@@ -3,13 +3,10 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -19,39 +16,28 @@ import javax.swing.border.LineBorder;
 import add.ESortOrder;
 import add.Methods;
 import classes.Contact;
-import classes.nObj;
+import classes.ContactExt;
 import res.Consts;
 
 import static add.ESortOrder.ASC;
 import static add.ESortOrder.DESC;
 
+/**
+ * Klasse für den Kontaktdetailscontainer
+ *
+ * Entwickler: Jan Schwenger
+ */
 public class JPanelContactDetails extends JPanel {
-
-
     private JLabel[] labels = new JLabel[7];
     private JLabel[] fields = new JLabel[7];
     private JPanel[] wrapperPanels = new JPanel[7], holderPanel;
     private JSplitPane splitPane;
     private JScrollPane scrollPaneDetails;
-    private JList list;
     private Contact contact;
-    private ResourceBundle bundle;
-
     private final String[] LABELS;
 
-    public Contact getContact() {
-        return contact;
-    }
-
-    public void setContact(Contact contact) {
-        this.contact = contact;
-    }
-
-    public JPanelContactDetails(JList list, MainFrame frame, ArrayList<Contact> alContacts, boolean search,
+    public JPanelContactDetails(JList contactList, MainFrame frame, ArrayList<Contact> allContacts, boolean searchState,
                                 DefaultListModel model, ResourceBundle bundle) {
-
-        this.list = list;
-        this.bundle = bundle;
 
         LABELS = new String[]{
                 bundle.getString(Consts.VORNAME),
@@ -79,7 +65,6 @@ public class JPanelContactDetails extends JPanel {
             wrapperPanels[i].setBorder(
                     BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new LineBorder(Color.BLACK)));
             wrapperPanels[i].setBackground(Color.LIGHT_GRAY);
-            //wrapperPanels[i].setPreferredSize(new Dimension(100,65));
 
             Border border = fields[i].getBorder();
             Border margin = new EmptyBorder(10, 10, 10, 10);
@@ -97,43 +82,34 @@ public class JPanelContactDetails extends JPanel {
 
         container.setLayout(layout2);
 
-        //container.setLayout(new GridLayout(fields.length, 1));
-
-
         JScrollPane scrollPane = new JScrollPane(container);
-        //JScrollPane scrollPane = new JScrollPane(container);
         fixScrolling(scrollPane);
 
         ScrollPaneLayout layoutP = new ScrollPaneLayout();
         scrollPane.setLayout(layoutP);
-
 
         JButton btnLoeschen = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("resources/delete.png"))));
         editButton(btnLoeschen);
         btnLoeschen.setToolTipText(bundle.getString(Consts.LOESCHEN));
         btnLoeschen.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 System.out.println("Löschen");
-                ArrayList<nObj> li = new ArrayList<>();
-                System.out.println(((nObj) list.getSelectedValue()).getContact().getFirstName());
-                alContacts.remove(((nObj) list.getSelectedValue()).getContact());
-                li.add((nObj) list.getSelectedValue());
+                ArrayList<ContactExt> li = new ArrayList<>();
+                System.out.println(((ContactExt) contactList.getSelectedValue()).getContact().getFirstName());
+                allContacts.remove(((ContactExt) contactList.getSelectedValue()).getContact());
+                li.add((ContactExt) contactList.getSelectedValue());
 
                 Methods.deleteItemFile(Methods.userHomeDir + Methods.DIR + Methods.FILE, li);
-                DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
+                DefaultListModel<Object> model = (DefaultListModel<Object>) contactList.getModel();
 
-                model.removeElementAt(list.getSelectedIndex());
+                model.removeElementAt(contactList.getSelectedIndex());
 
-                list.clearSelection();
+                contactList.clearSelection();
                 setVisible(false);
                 scrollPaneDetails.setVisible(false);
-                //scrollPane.setVisible(false);
                 splitPane.setDividerSize(0);
-
             }
         });
 
@@ -142,23 +118,21 @@ public class JPanelContactDetails extends JPanel {
         editButton(btnBearbeiten);
         btnBearbeiten.setToolTipText(bundle.getString(Consts.BEARBEITEN));
         btnBearbeiten.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 frame.setEnabled(false);
                 ESortOrder eSortOrder = null;
 
-                if (frame.getCustomMenu().rbMenuItem.isSelected())
+                if (frame.getCustomMenu().rbMenuItemSortASC.isSelected())
                     eSortOrder = ASC;
-                else if(frame.getCustomMenu().rbMenuItem2.isSelected())
+                else if(frame.getCustomMenu().rbMenuItemSortDESC.isSelected())
                     eSortOrder = DESC;
-                EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, alContacts, search, contact, model, bundle, eSortOrder);
+                EditNewContactFrame eFrame = new EditNewContactFrame(frame, contactList, allContacts, searchState, contact, model, bundle, eSortOrder);
 
                 eFrame.setContact(contact);
                 eFrame.setSplitPane(splitPane);
                 eFrame.setScrollPane(scrollPaneDetails);
                 eFrame.setContactDetails(JPanelContactDetails.this);
-
             }
         });
         JButton btnClose = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
@@ -167,16 +141,12 @@ public class JPanelContactDetails extends JPanel {
         editButton(btnClose);
         btnClose.setToolTipText(bundle.getString(Consts.SCHLIESSEN));
         btnClose.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                list.clearSelection();
-
+                contactList.clearSelection();
                 splitPane.setDividerSize(0);
                 scrollPaneDetails.setVisible(false);
-                //scrollPane.setVisible(false);
                 setVisible(false);
-
             }
         });
 
@@ -235,6 +205,10 @@ public class JPanelContactDetails extends JPanel {
         setVisible(false);
     }
 
+    public Contact getContact() {
+        return contact;
+    }
+
     public void setSplitPane(JSplitPane splitPane) {
         this.splitPane = splitPane;
     }
@@ -243,6 +217,9 @@ public class JPanelContactDetails extends JPanel {
         this.scrollPaneDetails = scrollPaneDetails;
     }
 
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
     public void setAllData(Contact data) {
         String[] adresse = data.getAddress().split(";");
         String street;
@@ -254,13 +231,10 @@ public class JPanelContactDetails extends JPanel {
             plzOrt = "";
             country = "";
         } else {
-
             if (adresse.length == 1 && adresse[0] != null && !adresse[0].isEmpty())
                 street = adresse[0];
             else
                 street = "";
-
-
             if (adresse.length == 2 && adresse[1] != null && !adresse[1].isEmpty()) {
                 if (adresse[0] != null)
                     street = adresse[0];
@@ -270,7 +244,6 @@ public class JPanelContactDetails extends JPanel {
             } else {
                 plzOrt = "";
             }
-
             if (adresse.length == 3 && adresse[2] != null && !adresse[2].isEmpty()) {
                 if (adresse[0] != null && !adresse[0].isEmpty())
                     street = adresse[0];
@@ -280,12 +253,10 @@ public class JPanelContactDetails extends JPanel {
                     plzOrt = adresse[1];
                 else
                     plzOrt = "";
-
                 country = adresse[2];
             } else {
                 country = "";
             }
-
         }
         System.out.println("S:" + street);
         System.out.println("P:" + plzOrt);
@@ -297,7 +268,6 @@ public class JPanelContactDetails extends JPanel {
         fields[4].setText(country);
         fields[5].setText(data.getPhone());
         fields[6].setText(data.getMail());
-
     }
 
     public static void fixScrolling(JScrollPane scrollpane) {
@@ -318,10 +288,8 @@ public class JPanelContactDetails extends JPanel {
     private void editButton(JButton button) {
         button.setBorderPainted(false);
         button.setBorder(null);
-//button.setFocusable(false);
         button.setMargin(new Insets(0, 0, 0, 0));
         button.setContentAreaFilled(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
-
 }

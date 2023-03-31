@@ -4,8 +4,8 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 
-/*
- * Hilfsklasse für das Beschränken von Textfeldern mit maximaler Anzahl an Stellen
+/**
+ * Hilfsklasse für das Beschränken von Textfeldern mit maximaler Anzahl an Stellen.
  *
  * Entwickler:  Jan Schwenger
  */

@@ -2,11 +2,13 @@ package classes;
 
 import java.io.Serializable;
 
-public class Contact implements Serializable {
+/**
+ * Kontaktklasse für das Repräsentieren eines Kontaktes
+ *
+ * Entwickler: Jan Schwenger
+ */
 
-    /**
-     *
-     */
+public class Contact implements Serializable {
     private static final long serialVersionUID = 1L;
     private String firstName, lastName, address, phone, mail;
     private long id;
