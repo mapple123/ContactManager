@@ -2,3 +2,6 @@
 /.idea/
 /KontaktVerwaltung/.classpath
 /KontaktVerwaltung/.project
+/KontaktVerwaltung/.settings/
+/KontaktVerwaltung/bin/
+/KontaktVerwaltung/production/

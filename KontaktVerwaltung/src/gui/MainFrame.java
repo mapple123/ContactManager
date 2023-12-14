@@ -5,11 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -41,12 +44,14 @@ public class MainFrame extends JFrame implements ComponentListener{
     private DefaultListModel model;
     private JSplitPane splitPane;
     private ResourceBundle bundle;
+    private String userHome;
 
-    public MainFrame(File file, ResourceBundle bundle) {
+    public MainFrame(File file, ResourceBundle bundle, String userHome) {
         super(bundle.getString(Consts.TITEL));
         setExtendedState(MAXIMIZED_BOTH);
         this.file = file;
         this.bundle = bundle;
+        this.userHome = userHome;
         initComponents();
         setComponents();
 
@@ -116,10 +121,10 @@ public class MainFrame extends JFrame implements ComponentListener{
                         if (i == 0) {
                             System.out.println(" Selections: ");
                         }
-                        System.out
-                                .println(selections[i] + "/" + ((ContactExt) selectionValues[i]).getContact().getId() + " ");
-                        System.out.println(((ContactExt) selectionValues[i]).getContact().toString());
-
+                       /* System.out
+                                .println(selections[i] + "/" + ((Contact) selectionValues[i]).getContact().getId() + " ");
+                        System.out.println(((Contact) selectionValues[i]).getContact().toString());
+*/
                         splitPane.setDividerSize(10);
                         splitPane.setDividerLocation(
                                 scrollPane.getLocation().x + (int) (getContentPane().getSize().getWidth() / 2));// jPanelContactDetails.getPreferredSize().width
@@ -134,25 +139,31 @@ public class MainFrame extends JFrame implements ComponentListener{
             }
         });
         menuBar = new CustomMenu(this, listFiles, allContacts, file.getAbsolutePath(), jPanelContactDetails,
-                splitPane, scrollPaneDetails, bundle);
+                splitPane, scrollPaneDetails, bundle, userHome);
         jtfSearch = new JTextField();
         jtfSearch.setPreferredSize(new Dimension(300, 35));
         jtfSearch.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
-                searchFilter(jtfSearch.getText());
+               /* searchFilter(jtfSearch.getText());
                 hideContactDetails();
+
+                */
             }
             @Override
             public void insertUpdate(DocumentEvent e) {
-                searchFilter(jtfSearch.getText());
+                /*searchFilter(jtfSearch.getText());
                 hideContactDetails();
+
+                 */
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                searchFilter(jtfSearch.getText());
+               /* searchFilter(jtfSearch.getText());
                 hideContactDetails();
+                
+                */
             }
         });
         JButton btnSearch = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
@@ -189,7 +200,17 @@ public class MainFrame extends JFrame implements ComponentListener{
             System.out.println(contact.getId());
             String firstName = allContacts.get(i).getFirstName();
             String lastName = allContacts.get(i).getLastName();
-            elements[i] = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+            String imgPath = allContacts.get(i).getImgPath();
+            MyIcon icon;
+
+            if(imgPath != null)
+                icon = new MyIcon(imgPath);
+            else
+                icon = new MyIcon();
+
+
+
+            elements[i] = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, icon,
                     firstName + " " + lastName, contact);
         }
         return elements;
@@ -206,13 +227,32 @@ public class MainFrame extends JFrame implements ComponentListener{
 
     protected DefaultListModel filterItems(String searchItem){
         DefaultListModel filteredItems = new DefaultListModel<>();
+       // DefaultListModel dlm = new DefaultListModel();
+       // for( int i=0; i<10000; ++i ) {
+            //dlm.addElement( "aaaa");
+       // }
+
         for (int i = 0; i < allContacts.size(); i++) {
             Contact contact = allContacts.get(i);
             String firstName = allContacts.get(i).getFirstName();
             String lastName = allContacts.get(i).getLastName();
-            ContactExt obj = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+           /* ContactExt obj = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
                     firstName + " " + lastName, contact);
+                    */
             String name = contact.getFirstName().toLowerCase() + " " + contact.getLastName().toLowerCase();
+
+            String imgPath = allContacts.get(i).getImgPath();
+            MyIcon icon;
+
+            if(imgPath != null){
+                icon = new MyIcon(imgPath);
+                System.out.println("IMG: " + imgPath);}
+            else
+                icon = new MyIcon();
+
+
+            ContactExt obj = new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, icon,
+                    firstName + " " + lastName, contact);
             if (name.contains(searchItem.toLowerCase())) {
                 filteredItems.addElement(obj);
             }

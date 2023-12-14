@@ -26,7 +26,7 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
     private JMenu menuNew, menuFilterSort, menuDelete, submenuSorting;
     private JMenuItem menuItemDelete, menuItemNew, menuItem3;
     private MainFrame frame;
-    private String path;
+    private String path, userHome;
     private JList<?> list;
     private ArrayList<Contact> allContacts;
     private JPanelContactDetails panelDetails;
@@ -36,7 +36,7 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
     private boolean search;
     protected JRadioButtonMenuItem rbMenuItemSortASC, rbMenuItemSortDESC, rbMenuItemSortLastNameASC, rbMenuItemSortLastNameDESC;
     public CustomMenu(MainFrame frame, JList<?> list, ArrayList<Contact> allContacts, String path,
-                      JPanelContactDetails panelDetails, JSplitPane splitPane, JScrollPane scrollPaneDetails, ResourceBundle bundle) {
+                      JPanelContactDetails panelDetails, JSplitPane splitPane, JScrollPane scrollPaneDetails, ResourceBundle bundle, String userHome) {
         this.path = path;
         this.frame = frame;
         this.list = list;
@@ -45,6 +45,7 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
         this.splitPane = splitPane;
         this.scrollPaneDetails = scrollPaneDetails;
         this.bundle = bundle;
+        this.userHome = userHome;
 
         menuBar = new JMenuBar();
 
@@ -132,7 +133,7 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
             eSortOrder = DESC;
         if (e.getSource() == menuItemNew) {
             frame.setEnabled(false);
-            EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, allContacts, search, null, null, bundle, eSortOrder);
+            EditNewContactFrame eFrame = new EditNewContactFrame(frame, list, allContacts, search, null, null, bundle, eSortOrder, userHome);
             eFrame.setContact(null);
         } else if (e.getSource() == menuItemDelete) {
             if (list.getSelectedIndices().length > 0) {
@@ -201,5 +202,9 @@ public class CustomMenu extends JMenuBar implements ActionListener , ItemListene
     }
     public void setAllContacts(ArrayList<Contact> allContacts){
         this.allContacts = allContacts;
+    }
+
+    public String getPath(){
+        return this.userHome;
     }
 }

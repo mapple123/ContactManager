@@ -17,6 +17,8 @@ public class ContactExt {
     private String name;
     private Contact contact;
 
+    private String imgPath;
+
     public ContactExt(Font font, Color color, MyIcon myIcon, String name, Contact contact) {
         this.font = font;
         this.color = color;
@@ -24,6 +26,18 @@ public class ContactExt {
         this.name = name;
         this.contact = contact;
     }
+
+    public ContactExt(Font arial, Color black, String imgPath, String name, Contact contact) {
+        this.font = font;
+        this.color = color;
+        this.imgPath = imgPath;
+        this.name = name;
+        this.contact = contact;
+
+
+
+
+        }
 
     public Font getFont() {
         return font;
@@ -42,6 +56,9 @@ public class ContactExt {
     }
 
     public MyIcon getMyIcon() {
+
+
+
         return myIcon;
     }
 

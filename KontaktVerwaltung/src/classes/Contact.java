@@ -10,23 +10,20 @@ import java.io.Serializable;
 
 public class Contact implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String firstName, lastName, address, phone, mail;
+    private String firstName, lastName, address, phone, mail, imgPath;
     private long id;
 
-    public Contact(String firstName, String lastName, String address, String phone, String mail) {
+    public Contact(String firstName, String lastName, String address, String phone, String mail, String imgPath) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.phone = phone;
         this.mail = mail;
+        this.imgPath = imgPath;
     }
 
-    public Contact(String firstName, String lastName, String address, String phone, String mail, long id) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-        this.phone = phone;
-        this.mail = mail;
+    public Contact(String firstName, String lastName, String address, String phone, String mail, String imgPath, long id) {
+        this(firstName,lastName,address,phone,mail, imgPath);
         this.id = id;
     }
 
@@ -84,4 +81,15 @@ public class Contact implements Serializable {
                 + this.phone + ", Mail: " + this.mail + ", ID: " + this.id;
     }
 
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+    public Contact getContact(){
+        return this;
+    }
 }

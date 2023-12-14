@@ -3,6 +3,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -21,6 +22,8 @@ import res.Consts;
 
 import static add.ESortOrder.ASC;
 import static add.ESortOrder.DESC;
+import static res.Consts.DIR;
+import static res.Consts.FILE;
 
 /**
  * Klasse für den Kontaktdetailscontainer
@@ -28,9 +31,9 @@ import static add.ESortOrder.DESC;
  * Entwickler: Jan Schwenger
  */
 public class JPanelContactDetails extends JPanel {
-    private JLabel[] labels = new JLabel[7];
-    private JLabel[] fields = new JLabel[7];
-    private JPanel[] wrapperPanels = new JPanel[7], holderPanel;
+    private JLabel[] labels = new JLabel[EditNewContactFrame.ITEM_SIZE];
+    private JLabel[] fields = new JLabel[EditNewContactFrame.ITEM_SIZE];
+    private JPanel[] wrapperPanels = new JPanel[EditNewContactFrame.ITEM_SIZE], holderPanel;
     private JSplitPane splitPane;
     private JScrollPane scrollPaneDetails;
     private Contact contact;
@@ -46,7 +49,8 @@ public class JPanelContactDetails extends JPanel {
                 bundle.getString(Consts.PLZORT),
                 bundle.getString(Consts.LAND),
                 bundle.getString(Consts.TELEFON),
-                bundle.getString(Consts.MAIL)
+                bundle.getString(Consts.MAIL),
+                bundle.getString(Consts.IMG)
         };
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
@@ -101,7 +105,7 @@ public class JPanelContactDetails extends JPanel {
                 allContacts.remove(((ContactExt) contactList.getSelectedValue()).getContact());
                 li.add((ContactExt) contactList.getSelectedValue());
 
-                Methods.deleteItemFile(Methods.userHomeDir + Methods.DIR + Methods.FILE, li);
+                Methods.deleteItemFile(Methods.userHomeDir + File.separator + DIR + File.separator +  FILE, li);
                 DefaultListModel<Object> model = (DefaultListModel<Object>) contactList.getModel();
 
                 model.removeElementAt(contactList.getSelectedIndex());
@@ -127,9 +131,9 @@ public class JPanelContactDetails extends JPanel {
                     eSortOrder = ASC;
                 else if(frame.getCustomMenu().rbMenuItemSortDESC.isSelected())
                     eSortOrder = DESC;
-                EditNewContactFrame eFrame = new EditNewContactFrame(frame, contactList, allContacts, searchState, contact, model, bundle, eSortOrder);
+                EditNewContactFrame eFrame = new EditNewContactFrame(frame, contactList, allContacts, searchState, contact, model, bundle, eSortOrder, frame.getCustomMenu().getPath());
 
-                eFrame.setContact(contact);
+                //eFrame.setContact(contact);
                 eFrame.setSplitPane(splitPane);
                 eFrame.setScrollPane(scrollPaneDetails);
                 eFrame.setContactDetails(JPanelContactDetails.this);
@@ -268,6 +272,7 @@ public class JPanelContactDetails extends JPanel {
         fields[4].setText(country);
         fields[5].setText(data.getPhone());
         fields[6].setText(data.getMail());
+        fields[7].setText(data.getImgPath());
     }
 
     public static void fixScrolling(JScrollPane scrollpane) {

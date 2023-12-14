@@ -1,31 +1,20 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Label;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 import add.ESortOrder;
@@ -36,6 +25,8 @@ import classes.Contact;
 import classes.ContactExt;
 import res.Consts;
 
+import static res.Consts.*;
+
 /**
  * Diese Klasse repräsentiert das Fenster, um neue Kontakte anzulegen und zusätzlich um vorhandene Kontakte zu
  * bearbeiten
@@ -44,26 +35,29 @@ import res.Consts;
  */
 public class EditNewContactFrame extends JFrame {
     private static final long serialVersionUID = 1L;
+    protected static final byte ITEM_SIZE = 8;
     private MainFrame mainFrame;
     private JList contactList;
     private ArrayList<Contact> allContacts;
     private boolean searchState;
     private ResourceBundle bundle;
     private final String[] LABELS;
-    private JLabel[] labels = new JLabel[7];
-    private JTextField[] fields = new JTextField[7];
-    private JPanel[] wrapperPanels = new JPanel[7];
+    private JLabel[] labels = new JLabel[ITEM_SIZE];
+    private JTextField[] fields = new JTextField[ITEM_SIZE];
+    private JPanel[] wrapperPanels = new JPanel[ITEM_SIZE];
     private Contact contact;
     private JSplitPane splitPane;
     private JScrollPane scrollPaneDetails;
     private JPanelContactDetails contactDetails;
     private DefaultListModel model;
     private ESortOrder eSortOrder;
+    private String userPath;
 
 
     public EditNewContactFrame(MainFrame mainFrame, JList contactList, final ArrayList<Contact> allContacts, boolean searchState,
-                               Contact contact, final DefaultListModel model, ResourceBundle bundle, ESortOrder eSortOrder) {
+                               Contact contact, final DefaultListModel model, ResourceBundle bundle, ESortOrder eSortOrder, String userPath) {
         super();
+        this.userPath = userPath;
         this.searchState = searchState;
         this.contactList = contactList;
         this.mainFrame = mainFrame;
@@ -78,7 +72,8 @@ public class EditNewContactFrame extends JFrame {
                 bundle.getString(Consts.PLZORT),
                 bundle.getString(Consts.LAND),
                 bundle.getString(Consts.TELEFON),
-                bundle.getString(Consts.MAIL)
+                bundle.getString(Consts.MAIL),
+                bundle.getString(Consts.IMG)
         };
         buildPanel(contact);
 
@@ -94,6 +89,7 @@ public class EditNewContactFrame extends JFrame {
                 String country = fields[4].getText().replace(",", "").replace(";", "").trim();
                 String phone = fields[5].getText().replace(",", "").trim();
                 String mail = fields[6].getText().replace(",", "").trim();
+                String imgPath = fields[7].getText().replace(",", "|").trim();
 
                 // Zuständig für das Abspeichern eines neuen Kontaktes
                 if (contact == null) {
@@ -103,20 +99,65 @@ public class EditNewContactFrame extends JFrame {
                                 "Die mit * gekenntzeichneten Felder müssen ausgefüllt werden!", "Achtung",
                                 JOptionPane.WARNING_MESSAGE);
                     else {
+
+                        //TODO: change icon implementation
+                        MyIcon icon;
+                        String outputImagePath = "";
+                        if (imgPath.equals(""))
+                            icon = new MyIcon();
+                        else{
+                            String inputImagePath = imgPath;
+                            outputImagePath = userPath + File.separator + DIR + "\\img\\image_"+ lastName+ "_"+firstName+ ".png";
+                            int targetWidth = 44; // New width of the image
+                            int targetHeight = 44; // New height of the image
+
+                            try {
+                                // Read the input image
+                                BufferedImage originalImage = ImageIO.read(new File(inputImagePath));
+
+                                // Create a new BufferedImage with the desired resolution
+                                BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+
+                                // Create a Graphics2D object from the resized image
+                                Graphics2D g2 = resizedImage.createGraphics();
+
+                                // Set rendering hints to improve the quality of the resized image
+                                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+                                // Draw the original image onto the resized image
+                                g2.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+
+                                // Dispose the Graphics2D object
+                                g2.dispose();
+
+                                // Write the resized image to the output file
+                                ImageIO.write(resizedImage, "png", new File(outputImagePath));
+
+                                System.out.println("Image resolution reduced successfully.");
+
+                            } catch (IOException e2) {
+                                e2.printStackTrace();
+                            }
+
+
+
+                            icon = new MyIcon(outputImagePath);
+                        }
+
                         Contact contact = Methods.saveContact(
-                                new Contact(firstName, lastName, street + ";" + ort + ";" + country, phone, mail));
+                                new Contact(firstName, lastName, street + ";" + ort + ";" + country, phone, mail, outputImagePath));
 
                         if (!searchState) {
                             DefaultListModel<Object> model = (DefaultListModel<Object>) contactList.getModel();
-                            model.addElement(new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, new MyIcon(),
+                            model.addElement(new ContactExt(new Font("Arial", Font.PLAIN, 20), Color.BLACK, icon,
                                     contact.getFirstName() + " " + contact.getLastName(), contact));
                         }
                         System.out.println("Test");
                         mainFrame.setEnabled(true);
 
-                        File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
+                        File f = new File(Methods.userHomeDir + File.separator + DIR + File.separator +  FILE);
                         Methods.editItem(f.getAbsolutePath(), new Contact(firstName, lastName,
-                                street + ";" + ort + ";" + country, phone, mail, contact.getId()));
+                                street + ";" + ort + ";" + country, phone, mail, outputImagePath, contact.getId()));
                         mainFrame.setEnabled(true);
                         allContacts.add(contact);
                         switch(eSortOrder){
@@ -142,10 +183,10 @@ public class EditNewContactFrame extends JFrame {
                     else {
                         System.out.println("Gespeichert:" + street);
 
-                        File f = new File(Methods.userHomeDir + Methods.DIR + Methods.FILE);
+                        File f = new File(Methods.userHomeDir + File.separator + DIR + File.separator + FILE);
                         allContacts.remove(contact);
                         Contact newContact = new Contact(firstName, lastName,
-                                street + ";" + ort + ";" + country, phone, mail, contact.getId());
+                                street + ";" + ort + ";" + country, phone, mail,imgPath, contact.getId());
                         Methods.editItem(f.getAbsolutePath(), newContact);
                         System.err.println(newContact.getId());
 
@@ -209,14 +250,18 @@ public class EditNewContactFrame extends JFrame {
             }
         };
         addWindowListener(listener);
-        setSize(new Dimension(750, 500));
+        setSize(new Dimension(Consts.WIDTH, Consts.HEIGHT));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
     }
     private void buildPanel(Contact contact) {
-        setComponents();
+        try {
+            setComponents();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (contact == null) {
             setTitle(bundle.getString(Consts.NEUTITEL));
         } else {
@@ -225,13 +270,13 @@ public class EditNewContactFrame extends JFrame {
         }
     }
 
-    private void setComponents() {
+    private void setComponents() throws IOException {
         JPanel container = new JPanel();
         for (int i = 0; i < labels.length; i++) {
             labels[i] = new JLabel(LABELS[i]);
             fields[i] = new JTextField();
 
-            fields[i].setDocument(new JTextFieldLimit(100));
+            fields[i].setDocument(new JTextFieldLimit(LIMIT));
             fields[i].setToolTipText(bundle.getString(Consts.LIMITTEXT));
 
             labels[i].setPreferredSize(new Dimension(100, 35));
@@ -239,11 +284,48 @@ public class EditNewContactFrame extends JFrame {
 
             wrapperPanels[i] = new JPanel();
 
+            wrapperPanels[i].setLayout(new FlowLayout(FlowLayout.LEFT));
+
             wrapperPanels[i].setBackground(new Color(0, 0, 0, 0));
             wrapperPanels[i].setBorder(new LineBorder(Color.BLACK));
 
             wrapperPanels[i].add(labels[i]);
             wrapperPanels[i].add(fields[i]);
+
+            if(i == 7){
+                fields[i].setVisible(true);
+                JButton btnSelectImg = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
+                        .getResource("resources/img.png"))));
+                btnSelectImg.setPreferredSize(new Dimension(25,25));
+
+                JLabel imageLabel = new JLabel();
+                imageLabel.setPreferredSize(new Dimension(44,44));
+                btnSelectImg.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JFileChooser fileChooser = new JFileChooser();
+                        int result = fileChooser.showOpenDialog(EditNewContactFrame.this);
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                            File selectedFile = fileChooser.getSelectedFile();
+                            fields[7].setText(selectedFile.getAbsolutePath());
+                            // Update the image label with the selected image
+                           /* ImageIcon imageIcon = new ImageIcon(selectedFile.getAbsolutePath());
+                            imageLabel.setIcon(imageIcon);*/
+
+                            // Read the selected image file
+                            //BufferedImage image = ImageIO.read(selectedFile);
+                            ImageIcon image = new MyIcon(selectedFile.getAbsolutePath()).getImg();
+                            // Resize the image to fit the label
+                            Image scaledImage = image.getImage().getScaledInstance(imageLabel.getWidth(), imageLabel.getHeight(), Image.SCALE_SMOOTH);
+                            // Update the image label with the scaled image
+                            ImageIcon imageIcon = new ImageIcon(scaledImage);
+                            imageLabel.setIcon(imageIcon);
+                        }
+                    }
+                });
+                wrapperPanels[i].add(imageLabel);
+                wrapperPanels[i].add(btnSelectImg);
+            }
 
             container.add(wrapperPanels[i]);
         }
@@ -297,6 +379,7 @@ public class EditNewContactFrame extends JFrame {
         fields[4].setText(country);
         fields[5].setText(data.getPhone());
         fields[6].setText(data.getMail());
+        fields[7].setText(data.getImgPath());
     }
 
     public void setSplitPane(JSplitPane splitPane) {

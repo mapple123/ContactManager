@@ -37,7 +37,10 @@ public class MyCustomListCellRenderer implements ListCellRenderer<Object> {
 			ContactExt values = (ContactExt) value;
 			font = values.getFont();
 			foreground = values.getColor();
-			icon = values.getMyIcon();
+			if (values.getMyIcon().getImg() == null)
+				icon = values.getMyIcon();
+			else
+				icon = values.getMyIcon().getImg();
 			text = values.getName();
 		} else {
 			font = list.getFont();

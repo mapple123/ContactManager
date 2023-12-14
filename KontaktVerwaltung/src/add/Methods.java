@@ -27,6 +27,9 @@ import classes.ContactExt;
 import gui.MainFrame;
 import res.Consts;
 
+import static res.Consts.DIR;
+import static res.Consts.FILE;
+
 /**
  * Allgemeine Methoden für die Funktionalität der kompletten Anwendung.
  *
@@ -36,8 +39,6 @@ public class Methods {
 
 	// TODO: Flexiblen Pfad für das Speichern der Textdateien
 	public static String userHomeDir = "";
-	public static final String DIR = "\\Kontaktverwaltung\\Kontakte";
-	public static final String FILE = "\\Kontaktdaten.txt";
 
 	// Öffentliche Methode zum Konfigurieren und zum Erstellen der Ordnerstruktur der Anwendung
 	public static void setUpMain() {
@@ -46,9 +47,9 @@ public class Methods {
 		Locale currentLocale = Locale.GERMAN;
 		System.out.println(currentLocale);
 		ResourceBundle bundle = ResourceBundle.getBundle(Consts.FILENAME, currentLocale);
-		File contactDataFile = new File(userHomeDir + DIR + FILE);
+		File contactDataFile = new File(userHomeDir + File.separator + DIR + File.separator +  FILE);
 		if (!contactDataFile.exists()) {
-			File dirFile = new File(userHomeDir + DIR);
+			File dirFile = new File(userHomeDir + File.separator + DIR);
 			dirFile.mkdirs();
 			try {
 				contactDataFile.createNewFile();
@@ -57,19 +58,20 @@ public class Methods {
 				e.printStackTrace();
 			}
 		}
-		new MainFrame(contactDataFile, bundle);
+		new MainFrame(contactDataFile, bundle, userHomeDir);
 	}
 
 	// Öffentliche Methode zum Speichern eines Kontaktes
 	// Rückgabewert: Objekt -> Kontakt
 	public static Contact saveContact(Contact contact) {
-		File file = new File(userHomeDir + DIR + FILE);
+		File file = new File(userHomeDir + File.separator + DIR + File.separator + FILE);
 		FileWriter fw;
 		String firstName = contact.getFirstName();
 		String lastName = contact.getLastName();
 		String address = contact.getAddress();
 		String phone = contact.getPhone();
 		String mail = contact.getMail();
+		String imgPath = (contact.getImgPath() == null)? "": contact.getImgPath();
 		long id = getLastContactId(file);
 		try {
 			fw = new FileWriter(file, true);
@@ -79,6 +81,7 @@ public class Methods {
 			bw.write(address + ",");
 			bw.write(phone + ",");
 			bw.write(mail + ",");
+			bw.write(imgPath + ",");
 			bw.write("" + id);
 			bw.newLine();
 			bw.close();
@@ -99,7 +102,7 @@ public class Methods {
 			BufferedReader br = new BufferedReader(fr);
 			while ((line = br.readLine()) != null) {
 				String[] conString = line.split(",");
-				contactIdList.add(Long.parseLong(conString[5]));
+				contactIdList.add(Long.parseLong(conString[6]));
 			}
 			br.close();
 		} catch (IOException e) {
@@ -136,7 +139,7 @@ public class Methods {
 			while ((line = br.readLine()) != null) {
 				String[] conString = line.split(",");
 				contact = new Contact(conString[0], conString[1], conString[2], conString[3], conString[4],
-						Long.parseLong(conString[5]));
+						(conString.length < 7)? null : conString[5], Long.parseLong(conString[6]));
 				contactList.add(contact);
 			}
 			br.close();
@@ -155,7 +158,7 @@ public class Methods {
 		try (Stream<String> all_lines = Files.lines(Paths.get(file.getAbsolutePath()))) {
 			specific_line_n = all_lines.skip(linePosition - 1).findFirst().get();
 			String[] sA = specific_line_n.split(",");
-			contact = new Contact(sA[0], sA[1], sA[2], sA[3], sA[4], Long.parseLong(sA[5]));
+			contact = new Contact(sA[0], sA[1], sA[2], sA[3], sA[4], sA[6], Long.parseLong(sA[5]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -191,7 +194,7 @@ public class Methods {
 			sb = new StringBuilder();
 			for (String s : arr) {
 				String[] sA = s.split(",");
-				if (sA[5].equals("" + line))
+				if (sA[6].equals("" + line))
 					continue;
 				else
 					sb.append(s + "\n");
@@ -236,10 +239,10 @@ public class Methods {
 			sb = new StringBuilder();
 			for (String s : arr) {
 				String[] sA = s.split(",");
-				if (sA[5].equals("" + line)) {
+				if (sA[6].equals("" + line)) {
 					System.err.println(s);
 					sb.append(c.getFirstName() + "," + c.getLastName() + "," + c.getAddress() + "," + c.getPhone() + ","
-							+ c.getMail() + "," + c.getId() + "\n");
+							+ c.getMail() + "," + c.getImgPath() + "," + c.getId() + "\n");
 				} else
 					sb.append(s + "\n");
 			}
